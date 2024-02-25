@@ -18,7 +18,7 @@ int main(void) {
 	SDL_Renderer *renderer = NULL;
 	// mx_render(&renderer);
 	int start = mx_create_window(&window, &renderer);
-	changeBackground("./resoursec/StartMenuImage.png", &renderer);
+	changeBackground("./resoursec/StartMenuImage.jpg", &renderer);
 
 	if (start == true) {
 		int last_frame_time = 0;
