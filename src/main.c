@@ -7,18 +7,21 @@ void mx_update(int *last_frame_time) {
 		SDL_Delay(wait);
 } 
 
-// void mx_render(SDL_Renderer **renderer) {
-// 	SDL_SetRenderDrawColor(*renderer, 177, 222, 250, 255);
-// 	SDL_RenderClear(*renderer);
-// 	SDL_RenderPresent(*renderer);
-// }
-
 int main(void) {
+	SDL_Init(SDL_INIT_AUDIO);
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
-	// mx_render(&renderer);
+	
 	int start = mx_create_window(&window, &renderer);
-	changeBackground("./resoursec/StartMenuImage.jpg", &renderer);
+	changeBackground("./resoursec/images/StartMenuImage.jpg", &renderer);
+	//c etogo momenta pizdec
+	//initialize sdl mixer
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	//Load audio files
+	Mix_Music *backgroundSound = Mix_LoadMUS("./resoursec/music/StartMenuMusic.mp3");
+    //Start music 
+	Mix_PlayMusic(backgroundSound, -1);
+	//i do etogo
 
 	if (start == true) {
 		int last_frame_time = 0;
@@ -30,6 +33,7 @@ int main(void) {
 		}
 	}
 	mx_destroy_window(&window, &renderer);
+
 	return 0;
 }
 
