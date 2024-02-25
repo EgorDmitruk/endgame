@@ -16,19 +16,18 @@ void mx_update(int *last_frame_time) {
 int main(void) {
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
+	mx_create_window(&window, &renderer);
+	int start = true;
+	int last_frame_time = 0;
+	mx_changeBackground("./resoursec/StartMenuImage.png", &renderer);
 	// mx_render(&renderer);
-	int start = mx_create_window(&window, &renderer);
-	changeBackground("./resoursec/StartMenuImage.jpg", &renderer);
 
-	if (start == true) {
-		int last_frame_time = 0;
-
-		while (start) {
-			mx_scan_input(&start);
-			mx_update(&last_frame_time);
-			// mx_render(&renderer);
-		}
+	while (start) {
+		mx_scan_input(&start);
+		mx_update(&last_frame_time);
+		// mx_render(&renderer);
 	}
+
 	mx_destroy_window(&window, &renderer);
 	return 0;
 }
