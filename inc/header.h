@@ -19,6 +19,7 @@ void mx_create_window(SDL_Window **window, SDL_Renderer **renderer);
 void mx_destroy_window(SDL_Window **window, SDL_Renderer **renderer);
 void mx_change_background(const char* imagePath,SDL_Renderer **renderer);
 void mx_scan_input(int *start);
+void mx_play_menu_music(const char *musicPath);
 
 void mx_printerr(const char *s);
 int mx_strlen(const char *s);

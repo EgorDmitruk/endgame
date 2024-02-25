@@ -16,14 +16,7 @@ int main(void) {
 	int start = true;
 	int last_frame_time = 0;
 	mx_change_background("./resoursec/images/StartMenuImage.png", &renderer);
-	//c etogo momenta pizdec
-	//initialize sdl mixer
-	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-	//Load audio files
-	Mix_Music *backgroundSound = Mix_LoadMUS("./resoursec/music/StartMenuMusic.mp3");
-    //Start music 
-	Mix_PlayMusic(backgroundSound, -1);
-	//i do etogo
+	mx_play_menu_music("./resoursec/music/StartMenuMusic.mp3");
 
 	while (start) {
 		mx_scan_input(&start);
