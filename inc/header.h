@@ -15,9 +15,9 @@
 #define FPS 60
 #define FRAME_TIME (1000 / FPS)
 
-bool mx_create_window(SDL_Window **window, SDL_Renderer **renderer);
+void mx_create_window(SDL_Window **window, SDL_Renderer **renderer);
 void mx_destroy_window(SDL_Window **window, SDL_Renderer **renderer);
-void changeBackground(const char* imagePath,SDL_Renderer **renderer);
+void mx_change_background(const char* imagePath,SDL_Renderer **renderer);
 void mx_scan_input(int *start);
 
 void mx_printerr(const char *s);

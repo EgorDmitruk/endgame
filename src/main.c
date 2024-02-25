@@ -11,9 +11,11 @@ int main(void) {
 	SDL_Init(SDL_INIT_AUDIO);
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
-	
-	int start = mx_create_window(&window, &renderer);
-	changeBackground("./resoursec/images/StartMenuImage.jpg", &renderer);
+
+	mx_create_window(&window, &renderer);
+	int start = true;
+	int last_frame_time = 0;
+	mx_change_background("./resoursec/images/StartMenuImage.jpg", &renderer);
 	//c etogo momenta pizdec
 	//initialize sdl mixer
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
@@ -23,15 +25,12 @@ int main(void) {
 	Mix_PlayMusic(backgroundSound, -1);
 	//i do etogo
 
-	if (start == true) {
-		int last_frame_time = 0;
-
-		while (start) {
-			mx_scan_input(&start);
-			mx_update(&last_frame_time);
-			// mx_render(&renderer);
-		}
+	while (start) {
+		mx_scan_input(&start);
+		mx_update(&last_frame_time);
+		// mx_render(&renderer);
 	}
+
 	mx_destroy_window(&window, &renderer);
 
 	return 0;

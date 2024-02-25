@@ -1,6 +1,6 @@
 #include "../inc/header.h"
 
-void changeBackground(const char* imagePath, SDL_Renderer **renderer) {
+void mx_change_background(const char* imagePath, SDL_Renderer **renderer) {
     // Загрузка изображения
     SDL_Surface* backgroundSurface = IMG_Load(imagePath);
     if (backgroundSurface == NULL) {
@@ -24,3 +24,4 @@ void changeBackground(const char* imagePath, SDL_Renderer **renderer) {
     // Освобождение ресурсов
     SDL_DestroyTexture(backgroundTexture);
 }
+
