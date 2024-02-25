@@ -15,7 +15,7 @@ int main(void) {
 	mx_create_window(&window, &renderer);
 	int start = true;
 	int last_frame_time = 0;
-	mx_change_background("./resoursec/images/StartMenuImage.jpg", &renderer);
+	mx_change_background("./resoursec/images/StartMenuImage.png", &renderer);
 	//c etogo momenta pizdec
 	//initialize sdl mixer
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
