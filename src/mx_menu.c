@@ -4,14 +4,13 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 			 int *start, int *start_play) {
 	SDL_Texture *start_background_tex = mx_change_background("./resources/images/StartMenuImage.png",
 															 renderer);
-	if (start_background_tex == NULL) {
+if (start_background_tex == NULL) {
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
 	SDL_Texture *about_us_background_tex = mx_change_background("./resources/images/Image2.png",
 															 renderer);
 	if (about_us_background_tex == NULL) {
-		SDL_DestroyTexture(start_background_tex);
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
@@ -19,49 +18,76 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
 
 	// create start menu buttons
+	int pd = 610;
+	int md = 470;
+	int ad = 330;
+	int ed = 190;
+
+	// play buttons
 	SDL_Rect play_button;
 	SDL_Texture *play_button_tex = mx_create_button("./resources/images/buttons/play.png",
-													renderer, &play_button, 610);
+													renderer, &play_button, pd);
 	if (play_button_tex == NULL) {
-		SDL_DestroyTexture(start_background_tex);
-		SDL_DestroyTexture(about_us_background_tex);
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
+	SDL_Rect play_glow_button;
+	SDL_Texture *play_glow_button_tex = mx_create_button("./resources/images/buttons/play_glow.png",
+														 renderer, &play_glow_button, pd);
+	if (play_glow_button_tex == NULL) {
+		mx_destroy_window(window, renderer);
+		exit(1);
+	}
+
+	// music buttons
 	SDL_Rect music_button;
 	SDL_Texture *music_button_tex = mx_create_button("./resources/images/buttons/music.png",
-													 renderer, &music_button, 490);
+													 renderer, &music_button, md);
 	if (music_button_tex == NULL) {
-		SDL_DestroyTexture(start_background_tex);
-		SDL_DestroyTexture(about_us_background_tex);
-		SDL_DestroyTexture(play_button_tex);
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
+	SDL_Rect music_glow_button;
+	SDL_Texture *music_glow_button_tex = mx_create_button("./resources/images/buttons/music_glow.png",
+													 	  renderer, &music_glow_button, md);
+	if (music_glow_button_tex == NULL) {
+		mx_destroy_window(window, renderer);
+		exit(1);
+	}
+
+	// about us buttons
 	SDL_Rect about_us_button;
 	SDL_Texture *about_us_button_tex = mx_create_button("./resources/images/buttons/about_us.png",
-														renderer, &about_us_button, 370);
+														renderer, &about_us_button, ad);
 	if (about_us_button_tex == NULL) {
-		SDL_DestroyTexture(start_background_tex);
-		SDL_DestroyTexture(about_us_background_tex);
-		SDL_DestroyTexture(play_button_tex);
-		SDL_DestroyTexture(music_button_tex);
+		mx_destroy_window(window, renderer);
+		exit(1);
+	}
+	SDL_Rect about_us_glow_button;
+	SDL_Texture *about_us_glow_button_tex = mx_create_button("./resources/images/buttons/about_us_glow.png",
+															 renderer, &about_us_glow_button, ad);
+	if (about_us_button_tex == NULL) {
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
 	int start_about_us = false;
+
+	// exit buttons
 	SDL_Rect exit_button;
 	SDL_Texture *exit_button_tex = mx_create_button("./resources/images/buttons/exit.png",
-													renderer, &exit_button, 250);
+													renderer, &exit_button, ed);
 	if (exit_button_tex == NULL) {
-		SDL_DestroyTexture(start_background_tex);
-		SDL_DestroyTexture(about_us_background_tex);
-		SDL_DestroyTexture(play_button_tex);
-		SDL_DestroyTexture(music_button_tex);
-		SDL_DestroyTexture(about_us_button_tex);
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
+	SDL_Rect exit_glow_button;
+	SDL_Texture *exit_glow_button_tex = mx_create_button("./resources/images/buttons/exit_glow.png",
+														 renderer, &exit_glow_button, ed);
+	if (exit_glow_button_tex == NULL) {
+		mx_destroy_window(window, renderer);
+		exit(1);
+	}
+
 	SDL_RenderClear(*renderer);
 	SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
 	SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
@@ -89,12 +115,12 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
-						Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 						if (event.button.x > (WIN_WIDTH - play_button.w) / 2
 							&& event.button.x < (WIN_WIDTH - play_button.w) / 2 + play_button.w
-							&& event.button.y > (WIN_HEIGHT - play_button.h) - 610
-							&& event.button.y < (WIN_HEIGHT - play_button.h) - 610 + play_button.h) {
+							&& event.button.y > (WIN_HEIGHT - play_button.h) - pd
+							&& event.button.y < (WIN_HEIGHT - play_button.h) - pd + play_button.h) {
 								if (!start_about_us) {
+									Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 									start_menu = false; // finish menu loop
 									*start_play = true; // play
 									changes = true;
@@ -102,10 +128,10 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 						}
 						else if (event.button.x > (WIN_WIDTH - music_button.w) / 2
 							&& event.button.x < (WIN_WIDTH - music_button.w) / 2 + music_button.w
-							&& event.button.y > (WIN_HEIGHT - music_button.h) - 490
-							&& event.button.y < (WIN_HEIGHT - music_button.h) - 490 + music_button.h) {
-								Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
+							&& event.button.y > (WIN_HEIGHT - music_button.h) - md
+							&& event.button.y < (WIN_HEIGHT - music_button.h) - md + music_button.h) {
 								if (!start_about_us) {
+									Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 									if (Mix_VolumeMusic(-1) != 0)
 										Mix_VolumeMusic(0); // no sound
 									else
@@ -115,16 +141,18 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 						}
 						else if (event.button.x > (WIN_WIDTH - about_us_button.w) / 2
 							&& event.button.x < (WIN_WIDTH - about_us_button.w) / 2 + about_us_button.w
-							&& event.button.y > (WIN_HEIGHT - about_us_button.h) - 370
-							&& event.button.y < (WIN_HEIGHT - about_us_button.h) - 370 + about_us_button.h) {
-								Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
+							&& event.button.y > (WIN_HEIGHT - about_us_button.h) - ad
+							&& event.button.y < (WIN_HEIGHT - about_us_button.h) - ad + about_us_button.h) {
+								if (!start_about_us) {
+									Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
+								}
 								start_about_us = true; // open about us
 								changes = true;
 						}
 						else if (event.button.x > (WIN_WIDTH - exit_button.w) / 2
 							&& event.button.x < (WIN_WIDTH - exit_button.w) / 2 + exit_button.w
-							&& event.button.y > (WIN_HEIGHT - exit_button.h) - 250
-							&& event.button.y < (WIN_HEIGHT - exit_button.h) - 250 + exit_button.h) {
+							&& event.button.y > (WIN_HEIGHT - exit_button.h) - ed
+							&& event.button.y < (WIN_HEIGHT - exit_button.h) - ed + exit_button.h) {
 								if (!start_about_us)
 									*start = false; // quit
 						}
@@ -133,6 +161,63 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 			}
 		}
 		SDL_Delay(100);
+
+		int x;
+		int y;
+		SDL_GetMouseState(&x, &y);
+		if (x > (WIN_WIDTH - play_button.w) / 2 && x < (WIN_WIDTH - play_button.w) / 2 + play_button.w
+			&& y > (WIN_HEIGHT - play_button.h) - pd && y < (WIN_HEIGHT - play_button.h) - pd + play_button.h
+			&& !start_about_us) {
+			SDL_RenderClear(*renderer);
+			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
+			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
+			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
+			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
+
+			SDL_RenderCopy(*renderer, play_glow_button_tex, NULL, &play_glow_button);
+			SDL_RenderPresent(*renderer);
+		}
+		else if (x > (WIN_WIDTH - music_button.w) / 2 && x < (WIN_WIDTH - music_button.w) / 2 + music_button.w
+			&& y > (WIN_HEIGHT - music_button.h) - md && y < (WIN_HEIGHT - music_button.h) - md + music_button.h
+			&& !start_about_us) {
+			SDL_RenderClear(*renderer);
+			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
+			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
+			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
+			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
+
+			SDL_RenderCopy(*renderer, music_glow_button_tex, NULL, &music_glow_button);
+			SDL_RenderPresent(*renderer);
+		}
+		else if (x > (WIN_WIDTH - about_us_button.w) / 2 && x < (WIN_WIDTH - about_us_button.w) / 2 + about_us_button.w
+			&& y > (WIN_HEIGHT - about_us_button.h) - ad && y < (WIN_HEIGHT - about_us_button.h) - ad + about_us_button.h && !start_about_us) {
+			SDL_RenderClear(*renderer);
+			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
+			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
+			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
+			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
+
+			SDL_RenderCopy(*renderer, about_us_glow_button_tex, NULL, &about_us_glow_button);
+			SDL_RenderPresent(*renderer);
+		}
+		else if (x > (WIN_WIDTH - exit_button.w) / 2 && x < (WIN_WIDTH - exit_button.w) / 2 + exit_button.w
+			&& y > (WIN_HEIGHT - exit_button.h) - ed && y < (WIN_HEIGHT - exit_button.h) - ed + exit_button.h
+			&& !start_about_us) {
+			SDL_RenderClear(*renderer);
+			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
+			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
+			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
+			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
+
+			SDL_RenderCopy(*renderer, exit_glow_button_tex, NULL, &exit_glow_button);
+			SDL_RenderPresent(*renderer);
+		}
+		else
+			changes = true;
 		if (changes == true) {
 			SDL_RenderClear(*renderer);
 			if (start_about_us) {
@@ -145,8 +230,8 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 				SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
 				SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
 			}
-    		SDL_RenderPresent(*renderer);
     		changes = false;
+    		SDL_RenderPresent(*renderer);
     	}
 	}
 	SDL_DestroyTexture(start_background_tex);
