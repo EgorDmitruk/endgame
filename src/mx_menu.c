@@ -16,7 +16,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 		exit(1);
 	}
 	mx_play_menu_music("./resources/music/StartMenuMusic.mp3");
-	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.mp3");
+	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
 
 	// create start menu buttons
 	SDL_Rect play_button;
@@ -89,6 +89,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
+						Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 						if (event.button.x > (WIN_WIDTH - play_button.w) / 2
 							&& event.button.x < (WIN_WIDTH - play_button.w) / 2 + play_button.w
 							&& event.button.y > (WIN_HEIGHT - play_button.h) - 610
@@ -103,6 +104,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 							&& event.button.x < (WIN_WIDTH - music_button.w) / 2 + music_button.w
 							&& event.button.y > (WIN_HEIGHT - music_button.h) - 490
 							&& event.button.y < (WIN_HEIGHT - music_button.h) - 490 + music_button.h) {
+								Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 								if (!start_about_us) {
 									if (Mix_VolumeMusic(-1) != 0)
 										Mix_VolumeMusic(0); // no sound
@@ -115,6 +117,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 							&& event.button.x < (WIN_WIDTH - about_us_button.w) / 2 + about_us_button.w
 							&& event.button.y > (WIN_HEIGHT - about_us_button.h) - 370
 							&& event.button.y < (WIN_HEIGHT - about_us_button.h) - 370 + about_us_button.h) {
+								Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 								start_about_us = true; // open about us
 								changes = true;
 						}
