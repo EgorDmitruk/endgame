@@ -30,3 +30,4 @@ void mx_create_window(SDL_Window **window, SDL_Renderer **renderer) {
 		exit(1);
 	}
 }
+
