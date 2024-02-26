@@ -8,7 +8,6 @@ void mx_update(int *last_frame_time) {
 } 
 
 int main(void) {
-	SDL_Init(SDL_INIT_AUDIO);
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
 
