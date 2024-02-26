@@ -17,9 +17,11 @@
 
 void mx_create_window(SDL_Window **window, SDL_Renderer **renderer);
 void mx_destroy_window(SDL_Window **window, SDL_Renderer **renderer);
-void mx_change_background(const char* imagePath,SDL_Renderer **renderer);
-void mx_scan_input(int *start);
+SDL_Texture *mx_change_background(const char* imagePath, SDL_Renderer **renderer);
+SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer, SDL_Rect *button, int down);
+void mx_menu(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play, int *last_frame_time);
 void mx_play_menu_music(const char *musicPath);
+void mx_menu_update(int *last_frame_time);
 
 void mx_printerr(const char *s);
 int mx_strlen(const char *s);
