@@ -12,22 +12,23 @@ int main(void) {
 	// play loop
 	while (start && start_play) {
 		SDL_Event event;
-		SDL_PollEvent(&event);
-
-		switch (event.type) {
-			case SDL_QUIT:
-				start = false; // quit
-				break;
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE)
-					//
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == SDL_BUTTON_LEFT) {
+		while (SDL_PollEvent(&event) != 0) {
+			switch (event.type) {
+				case SDL_QUIT:
+					start = false; // quit
+					break;
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE)
+						//
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == SDL_BUTTON_LEFT) {
 					
-				}
-				break;
+					}
+					break;
+			}
 		}
+		SDL_Delay(100);
 	}
 
 	mx_destroy_window(&window, &renderer);
