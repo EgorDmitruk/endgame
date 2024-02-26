@@ -16,6 +16,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 		exit(1);
 	}
 	mx_play_menu_music("./resources/music/StartMenuMusic.mp3");
+	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.mp3");
 
 	// create start menu buttons
 	SDL_Rect play_button;
