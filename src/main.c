@@ -7,8 +7,7 @@ int main(void) {
 
 	int start = true;
 	int start_play = false;
-	int last_frame_time = 0;
-	mx_menu(&window, &renderer, &start, &start_play, &last_frame_time);
+	mx_menu(&window, &renderer, &start, &start_play);
 
 	// play loop
 	while (start && start_play) {
@@ -29,7 +28,6 @@ int main(void) {
 				}
 				break;
 		}
-		mx_menu_update(&last_frame_time);
 	}
 
 	mx_destroy_window(&window, &renderer);
