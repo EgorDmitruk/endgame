@@ -8,13 +8,19 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
+	SDL_Texture *dark_background_tex = mx_change_background("./resources/images/dark_background.png",
+															renderer);
+	if (dark_background_tex == NULL) {
+		mx_destroy_window(window, renderer);
+		exit(1);
+	}
 	SDL_Texture *rules_background_tex = mx_change_background("./resources/images/Image2.png",
 															 renderer);
 	if (rules_background_tex == NULL) {
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
-	// mx_play_menu_music("./resources/music/StartMenuMusic.mp3");
+
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
 
 	// create side buttons
@@ -62,7 +68,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 	int pause = false;
 	SDL_Rect pause_text;
 	SDL_Texture *pause_text_tex = mx_create_button("./resources/images/pause_text.png",
-												   renderer, &pause_text, 350, 475, 1, 1);
+												   renderer, &pause_text, 400, 475, 1, 1);
 	if (pause_text_tex == NULL) {
 		mx_destroy_window(window, renderer);
 		exit(1);
@@ -166,6 +172,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 			else {
 				SDL_RenderCopy(*renderer, game_background_tex, NULL, NULL);
 				if (pause) {
+					SDL_RenderCopy(*renderer, dark_background_tex, NULL, NULL);
 					SDL_RenderCopy(*renderer, start_button_tex, NULL, &start_button);
 					SDL_RenderCopy(*renderer, pause_text_tex, NULL, &pause_text);
 				}
@@ -183,6 +190,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
     	}
 	}
 	SDL_DestroyTexture(game_background_tex);
+	SDL_DestroyTexture(dark_background_tex);
 	SDL_DestroyTexture(rules_background_tex);
 	SDL_DestroyTexture(pause_text_tex);
     SDL_DestroyTexture(music_on_button_tex);
