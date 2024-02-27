@@ -89,9 +89,91 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
+	
+        //~~~//	
+	
+    cell map[10][10];
+    mx_map(map);
+    int x, y;
+    int check_up = -1;
+    int check_down = -1;
+    int check_left = -1;
+    int check_right = -1;
+    int treasure = -1;
+    SDL_Surface *tempsurf = IMG_Load("../resources/images/locations/fog.png");
+    SDL_Texture *fog = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    SDL_FreeSurface(tempsurf);
+    SDL_Rect fogrect;
+    fogrect.x = 265;
+    fogrect.y = 180;
+    fogrect.w = 670;
+    fogrect.h = 670;
+    SDL_Surface *elements[11];
+    elements[0] = IMG_Load("../resources/images/locations/0.png");
+    elements[1] = IMG_Load("../resources/images/locations/1.png");
+    elements[2] = IMG_Load("../resources/images/locations/2.png");
+    elements[3] = IMG_Load("../resources/images/locations/3.png");
+    elements[4] = IMG_Load("../resources/images/locations/4.png");
+    elements[5] = IMG_Load("../resources/images/locations/5.png");
+    elements[6] = IMG_Load("../resources/images/locations/6.png");
+    elements[7] = IMG_Load("../resources/images/locations/7.png");
+    elements[8] = IMG_Load("../resources/images/locations/8.png");
+    elements[9] = IMG_Load("../resources/images/locations/9.png");
+    elements[10] = IMG_Load("../resources/images/locations/10.png");
+    SDL_Texture *element[11];
+    for (int i = 0; i < 11; ++i) {
+        element[i] = SDL_CreateTextureFromSurface(*renderer, elements[i]);
+	SDL_FreeSurface(elements[i]);
+    }
+    SDL_Rect rectangles[5][5];
+    for (int i = 0; i < 5; ++i) {
+        for(int j = 0; j < 5; ++j) {
+	    rectangles[i][j].x = 265 + 265 * j;
+            rectangles[i][j].y = 180 + 180 * i;
+            rectangles[i][j].w = 134;
+            rectangles[i][j].h = 134;
+	}
+    }
+    x = 6;
+    y = 3;
+    map[y][x].cell_shown = true;
+    
+        //~~~//
 
 	SDL_RenderClear(*renderer);
 	SDL_RenderCopy(*renderer, game_background_tex, NULL, NULL);
+
+        //~~~//
+	
+	SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
+	int iteri = 0;
+	int iterj = 0;
+	int stopi = y + 3 < 10 ? y + 3 : 10;
+	int stopj = x + 3 < 10 ? x + 3 : 10;
+	for (int i = y - 2 > -1 ? y - 2 : 0; i < stopi; ++i) {
+	    iterj = 0;
+	    for (int j = x - 2 > -1 ? x - 2 : 0; j < stopj; ++j) {
+		if (map[i][j].cell_shown)
+	            SDL_RenderCopy(*renderer, element[0], NULL, &(rectangles[iteri][iterj]));
+		if (map[i][j].wall_up_shown)
+                    SDL_RenderCopy(*renderer, element[1], NULL, &(rectangles[iteri][iterj]));
+		if (map[i][j].wall_down_shown)
+                    SDL_RenderCopy(*renderer, element[2], NULL, &(rectangles[iteri][iterj]));
+		if (map[i][j].wall_left_shown)
+                    SDL_RenderCopy(*renderer, element[3], NULL, &(rectangles[iteri][iterj]));
+		if (map[i][j].wall_right_shown)
+                    SDL_RenderCopy(*renderer, element[4], NULL, &(rectangles[iteri][iterj]));
+		if (map[i][j].river_shown)
+                    SDL_RenderCopy(*renderer, element[5 + map[i][j].river_num], NULL, &(rectangles[iteri][iterj]));
+		if (map[i][j].portal_shown)
+                    SDL_RenderCopy(*renderer, element[8 + map[i][j].portal_num], NULL, &(rectangles[iteri][iterj]));
+		++iterj;
+	    }
+	    ++iteri;
+	}
+
+        //~~~//
+
 	SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
 	SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
 	SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
@@ -113,6 +195,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 						rules = false; // close rules
 						changes = true;
 					}
+
+        //~~~//
+
+					else if (event.key.keysym.sym == SDLK_UP) {
+                                           check_up = mx_check_up(map, y, x);
+                                           changes = true;
+                                       }
+                                       else if (event.key.keysym.sym == SDLK_DOWN) {
+                                           check_down = mx_check_down(map, y, x);
+                                           changes = true;
+                                       }
+                                       else if (event.key.keysym.sym == SDLK_LEFT) {
+                                           check_left = mx_check_left(map, y, x);
+                                           changes = true;
+                                       }
+                                       else if (event.key.keysym.sym == SDLK_RIGHT) {
+                                           check_right = mx_check_right(map, y, x);
+                                           changes = true;
+                                       }
+
+        //~~~//
+
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
@@ -165,12 +269,329 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		}
 		SDL_Delay(100);
 
+        //~~~//
+
+		
+	    if (check_up != -1) {
+            switch(check_up) {
+                case 0: {
+                    map[y - 1][x].cell_shown = true;
+		    y -= 1;
+		    break;
+                }
+                case 1: {
+                    map[y][x].wall_up_shown = true;
+		    break;
+                }
+                case 2: {
+                    if (treasure == 1)
+                        start_play = false;
+                    else if (treasure == 0)
+                        treasure = -1;// ложный клад
+                    //else
+                        // без клада
+		    break;
+                }
+                case 3: {
+                    map[y - 1][x].river_shown = true;
+		    y -= 1;
+		    int prevy = y;
+		    int prevx = x;
+		    y = map[prevy][prevx].river->y;
+		    x = map[prevy][prevx].river->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].river_shown = true;
+		    break;
+                }
+                case 4: {
+                    map[y - 1][x].portal_shown = true;
+                    y -= 1;
+                    int prevy = y;
+		    int prevx = x;
+                    y = map[prevy][prevx].portal->y;
+                    x = map[prevy][prevx].portal->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].portal_shown = true;
+                    break;
+                }
+                case 5: {
+		    y -= 1;
+                    treasure = map[y][x].treasure;
+		    map[y][x].cell_shown = true;
+                }
+            }
+        }
+        if (check_down != -1) { // со следующими свичами наподобие как с предыдущим
+            switch(check_down) {
+                case 0: {
+                    map[y + 1][x].cell_shown = true;
+                    y += 1;
+                    break;
+                }
+                case 1: {
+                    map[y][x].wall_down_shown = true;
+                    break;
+                }
+                case 2: {
+                    if (treasure == 1)
+                        start_play = false;
+                    else if (treasure == 0)
+                        treasure = -1;// ложный клад
+                    //else
+                        // без клада
+                    break;
+                }
+                case 3: {
+                    map[y + 1][x].river_shown = true;
+                    y += 1;
+                    int prevy = y;
+		    int prevx = x;
+                    y = map[prevy][prevx].river->y;
+                    x = map[prevy][prevx].river->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].river_shown = true;
+                    break;
+                }
+                case 4: {
+                    map[y + 1][x].portal_shown = true;
+                    y += 1;
+                    int prevy = y;
+		    int prevx = x;
+                    y = map[prevy][prevx].portal->y;
+                    x = map[prevy][prevx].portal->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].portal_shown = true;
+                    break;
+                }
+                case 5: {
+		    y += 1;
+                    treasure = map[y][x].treasure;
+		    map[y][x].cell_shown = true;
+                }
+            }
+        }
+        if (check_left != -1) {
+            switch(check_left) {
+                case 0: {
+                    map[y][x - 1].cell_shown = true;
+                    x -= 1;
+                    break;
+                }
+                case 1: {
+                    map[y][x].wall_left_shown = true;
+                    break;
+                }
+                case 2: {
+                    if (treasure == 1)
+                        start_play = false;
+                    else if (treasure == 0)
+                        treasure = -1;// ложный клад
+                    //else
+                        // без клада
+                    break;
+                }
+                case 3: {
+                    map[y][x - 1].river_shown = true;
+                    x -= 1;
+                    int prevy = y;
+                    int prevx = x;
+                    y = map[prevy][prevx].river->y;
+                    x = map[prevy][prevx].river->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].river_shown = true;
+                    break;
+                }
+                case 4: {
+                    map[y][x - 1].portal_shown = true;
+                    x -= 1;
+                    int prevy = y;
+                    int prevx = x;
+                    y = map[prevy][prevx].portal->y;
+                    x = map[prevy][prevx].portal->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].portal_shown = true;
+                    break;
+                }
+                case 5: {
+                    x -= 1;
+                    treasure = map[y][x].treasure;
+                    map[y][x].cell_shown = true;
+                }
+            }
+        }
+        if (check_right != -1) {
+            switch(check_right) {
+                case 0: {
+                    map[y][x + 1].cell_shown = true;
+                    x += 1;
+                    break;
+                }
+                case 1: {
+                    map[y][x].wall_right_shown = true;
+                    break;
+                }
+                case 2: {
+                    if (treasure == 1)
+                        start_play = false;
+                    else if (treasure == 0)
+                        treasure = -1;// ложный клад
+                    //else
+                        // без клада
+                    break;
+                }
+                case 3: {
+                    map[y][x + 1].river_shown = true;
+                    x += 1;
+                    int prevy = y;
+                    int prevx = x;
+                    y = map[prevy][prevx].river->y;
+                    x = map[prevy][prevx].river->x;
+		    for (int i = 0; i < 10; ++i) {
+                        for (int j = 0; j < 10; ++j) {
+                            map[i][j].cell_shown = false;
+                            map[i][j].wall_up_shown = false;
+                            map[i][j].wall_down_shown = false;
+                            map[i][j].wall_left_shown = false;
+                            map[i][j].wall_right_shown = false;
+                            map[i][j].river_shown = false;
+                            map[i][j].portal_shown = false;
+                        }
+                    }
+		    map[y][x].river_shown = true;
+                    break;
+                }
+                case 4: {
+                    map[y][x + 1].portal_shown = true;
+                    x += 1;
+                    int prevy = y;
+                    int prevx = x;
+                    y = map[prevy][prevx].portal->y;
+                    x = map[prevy][prevx].portal->x;
+		    for (int i = 0; i < 10; ++i) {
+		        for (int j = 0; j < 10; ++j) {
+			    map[i][j].cell_shown = false;
+			    map[i][j].wall_up_shown = false;
+			    map[i][j].wall_down_shown = false;
+			    map[i][j].wall_left_shown = false;
+			    map[i][j].wall_right_shown = false;
+			    map[i][j].river_shown = false;
+			    map[i][j].portal_shown = false;
+			}
+		    }
+		    map[y][x].portal_shown = true;
+                    break;
+                }
+                case 5: {
+                    x += 1;
+                    treasure = map[y][x].treasure;
+                    map[y][x].cell_shown = true;
+                }
+            }
+        }
+        check_up = -1;
+        check_down = -1;
+        check_left = -1;
+        check_right = -1;
+
+        //~~~//
+
 		if (changes == true) {
 			SDL_RenderClear(*renderer);
 			if (rules)
 				SDL_RenderCopy(*renderer, rules_background_tex, NULL, NULL);
 			else {
 				SDL_RenderCopy(*renderer, game_background_tex, NULL, NULL);
+
+        //~~~//
+				
+				SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
+				iteri = 0;
+				stopi = y + 3 < 10 ? y + 3 : 10;
+				stopj = x + 3 < 10 ? x + 3 : 10;
+                        	for (int i = y - 2 > -1 ? y - 2 : 0; i < stopi; ++i) {
+	                           iterj = 0;
+	                           for (int j = x - 2 > -1 ? x - 2 : 0; j < stopj; ++j) {
+		                       if (map[i][j].cell_shown)
+	                                   SDL_RenderCopy(*renderer, element[0], NULL, &(rectangles[iteri][iterj]));
+		                       if (map[i][j].wall_up_shown)
+                                           SDL_RenderCopy(*renderer, element[1], NULL, &(rectangles[iteri][iterj]));
+		                       if (map[i][j].wall_down_shown)
+                                           SDL_RenderCopy(*renderer, element[2], NULL, &(rectangles[iteri][iterj]));
+		                       if (map[i][j].wall_left_shown)
+                                           SDL_RenderCopy(*renderer, element[3], NULL, &(rectangles[iteri][iterj]));
+		                       if (map[i][j].wall_right_shown)
+                                           SDL_RenderCopy(*renderer, element[4], NULL, &(rectangles[iteri][iterj]));
+		                       if (map[i][j].river_shown)
+                                           SDL_RenderCopy(*renderer, element[5 + map[i][j].river_num], NULL, &(rectangles[iteri][iterj]));
+		                       if (map[i][j].portal_shown)
+                                           SDL_RenderCopy(*renderer, element[8 + map[i][j].portal_num], NULL, &(rectangles[iteri][iterj]));
+		                       ++iterj;
+	                           }
+	                           ++iteri;
+	                       }
+
+        //~~~//
+
 				if (pause) {
 					SDL_RenderCopy(*renderer, dark_background_tex, NULL, NULL);
 					SDL_RenderCopy(*renderer, start_button_tex, NULL, &start_button);
@@ -189,6 +610,15 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
     		SDL_RenderPresent(*renderer);
     	}
 	}
+
+        //~~~//
+
+	for (int i = 0; i < 11; ++i)
+	    SDL_DestroyTexture(element[i]);
+	SDL_DestroyTexture(fog);
+
+        //~~~//
+
 	SDL_DestroyTexture(game_background_tex);
 	SDL_DestroyTexture(dark_background_tex);
 	SDL_DestroyTexture(rules_background_tex);
