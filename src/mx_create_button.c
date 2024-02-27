@@ -1,6 +1,7 @@
 #include "../inc/header.h"
 
-SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer, SDL_Rect *button, int down) {
+SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer,
+							  SDL_Rect *button, int down, int side, int cx, int cy) {
     SDL_Surface *button_surf = IMG_Load(image_path);
     if (button_surf == NULL) {
         mx_printerr("error creating button surface: ");
@@ -19,11 +20,8 @@ SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer, S
     }
 
     SDL_QueryTexture(button_tex, NULL, NULL, &button->w, &button->h);
-    button->x = (WIN_WIDTH - button->w) / 2;
-    button->y = (WIN_HEIGHT - button->h) - down;
-
-    /*SDL_RenderCopy(*renderer, button_tex, NULL, button);
-    SDL_RenderPresent(*renderer);*/
+    button->x = (WIN_WIDTH - button->w) / cx - side;
+    button->y = (WIN_HEIGHT - button->h) / cy - down;
 
     return button_tex;
 }

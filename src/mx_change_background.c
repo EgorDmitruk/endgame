@@ -16,10 +16,6 @@ SDL_Texture *mx_change_background(const char* imagePath, SDL_Renderer **renderer
         return NULL;
     }
 
-    // Очистка рендера и отображение новой текстуры
-    /*SDL_RenderClear(*renderer);
-    SDL_RenderCopy(*renderer, backgroundTexture, NULL, NULL);
-    SDL_RenderPresent(*renderer);*/
     return backgroundTexture;
 }
 

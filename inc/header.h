@@ -18,9 +18,12 @@
 void mx_create_window(SDL_Window **window, SDL_Renderer **renderer);
 void mx_destroy_window(SDL_Window **window, SDL_Renderer **renderer);
 SDL_Texture *mx_change_background(const char* imagePath, SDL_Renderer **renderer);
-SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer, SDL_Rect *button, int down);
+SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer,
+							  SDL_Rect *button, int down, int side, int cx, int cy);
 void mx_menu(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play);
+void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play);
 void mx_play_menu_music(const char *musicPath);
+// prototype for func for game music
 
 void mx_printerr(const char *s);
 int mx_strlen(const char *s);
