@@ -14,7 +14,10 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
-	mx_play_menu_music("./resources/music/StartMenuMusic.mp3");
+
+	int MusicFlag = 1;
+	mx_play_menu_music("./resources/music/StartMenuMusic.mp3", MusicFlag);
+	
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
 
 	// create start menu buttons
@@ -125,6 +128,8 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 									start_menu = false; // finish menu loop
 									*start_play = true; // play
 									changes = true;
+									MusicFlag = 2;
+									mx_play_menu_music("./resources/music/gameplayMusic.mp3", MusicFlag);
 								}
 						}
 						else if (event.button.x > music_button.x

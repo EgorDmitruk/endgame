@@ -22,7 +22,7 @@ SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer,
 							  SDL_Rect *button, int down, int side, int cx, int cy);
 void mx_menu(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play);
 void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play);
-void mx_play_menu_music(const char *musicPath);
+void mx_play_menu_music(const char *musicPath, int MusicFlag);
 // prototype for func for game music
 
 void mx_printerr(const char *s);
