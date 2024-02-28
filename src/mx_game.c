@@ -89,9 +89,6 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
-	
-        //~~~//	
-	
     cell map[10][10];
     mx_map(map);
     int x, y;
@@ -100,7 +97,14 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
     int check_left = -1;
     int check_right = -1;
     int treasure = -1;
-    SDL_Surface *tempsurf = IMG_Load("../resources/images/locations/fog.png");
+    SDL_Surface *tempsurf = IMG_Load("./resources/images/locations/fog.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+        mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
     SDL_Texture *fog = SDL_CreateTextureFromSurface(*renderer, tempsurf);
     SDL_FreeSurface(tempsurf);
     SDL_Rect fogrect;
@@ -108,50 +112,145 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
     fogrect.y = 180;
     fogrect.w = 670;
     fogrect.h = 670;
-    SDL_Surface *elements[11];
-    elements[0] = IMG_Load("../resources/images/locations/0.png");
-    elements[1] = IMG_Load("../resources/images/locations/1.png");
-    elements[2] = IMG_Load("../resources/images/locations/2.png");
-    elements[3] = IMG_Load("../resources/images/locations/3.png");
-    elements[4] = IMG_Load("../resources/images/locations/4.png");
-    elements[5] = IMG_Load("../resources/images/locations/5.png");
-    elements[6] = IMG_Load("../resources/images/locations/6.png");
-    elements[7] = IMG_Load("../resources/images/locations/7.png");
-    elements[8] = IMG_Load("../resources/images/locations/8.png");
-    elements[9] = IMG_Load("../resources/images/locations/9.png");
-    elements[10] = IMG_Load("../resources/images/locations/10.png");
+    SDL_Surface *elements[11]; // массив с картинками пустой клетки, стен, рек, порталов
+    elements[0] = IMG_Load("./resources/images/locations/0.png");// загрузить в каждый элемент картинку с помощью IMG_Load(определённая картинка);
+    if (elements[0] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[1] = IMG_Load("./resources/images/locations/1.png");
+    if (elements[1] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[2] = IMG_Load("./resources/images/locations/2.png");
+    if (elements[2] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[3] = IMG_Load("./resources/images/locations/3.png");
+    if (elements[3] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[4] = IMG_Load("./resources/images/locations/4.png");
+    if (elements[4] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[5] = IMG_Load("./resources/images/locations/5.png");
+    if (elements[5] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[6] = IMG_Load("./resources/images/locations/6.png");
+    if (elements[6] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[7] = IMG_Load("./resources/images/locations/7.png");
+    if (elements[7] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[8] = IMG_Load("./resources/images/locations/8.png");
+    if (elements[8] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[9] = IMG_Load("./resources/images/locations/9.png");
+    if (elements[9] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    elements[10] = IMG_Load("./resources/images/locations/10.png");
+    if (elements[10] == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
     SDL_Texture *element[11];
     for (int i = 0; i < 11; ++i) {
         element[i] = SDL_CreateTextureFromSurface(*renderer, elements[i]);
 	SDL_FreeSurface(elements[i]);
+        if (element[i] == NULL) {
+            mx_printerr("error creating field surface: ");
+	    mx_printerr(SDL_GetError());
+	    mx_printerr("\n");
+	    mx_destroy_window(window, renderer);
+	    exit(1);
+        }
     }
     SDL_Rect rectangles[5][5];
     for (int i = 0; i < 5; ++i) {
         for(int j = 0; j < 5; ++j) {
-	    rectangles[i][j].x = 265 + 265 * j;
-            rectangles[i][j].y = 180 + 180 * i;
+	    rectangles[i][j].x = 265 + 134 * j;
+            rectangles[i][j].y = 180 + 134 * i;
             rectangles[i][j].w = 134;
             rectangles[i][j].h = 134;
 	}
     }
+    tempsurf = IMG_Load("./resources/images/locations/character.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating character surface: ");
+	mx_printerr(SDL_GetError());
+        mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    SDL_Texture *character = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    SDL_FreeSurface(tempsurf);
+    SDL_Rect charrect;
+    charrect.x = 533;
+    charrect.y = 448;
+    charrect.w = 134;
+    charrect.h = 134;
     x = 6;
     y = 3;
     map[y][x].cell_shown = true;
-    
-        //~~~//
 
 	SDL_RenderClear(*renderer);
 	SDL_RenderCopy(*renderer, game_background_tex, NULL, NULL);
 
-        //~~~//
-	
 	SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
-	int iteri = 0;
-	int iterj = 0;
 	int stopi = y + 3 < 10 ? y + 3 : 10;
 	int stopj = x + 3 < 10 ? x + 3 : 10;
+	int iteri = y - 2 > 0 ? 0 : 2 - y;
+	int iterj = x - 2 > 0 ? 0 : 2 - x;
 	for (int i = y - 2 > -1 ? y - 2 : 0; i < stopi; ++i) {
-	    iterj = 0;
+	    iterj = x - 2 > 0 ? 0 : 2 - x;
 	    for (int j = x - 2 > -1 ? x - 2 : 0; j < stopj; ++j) {
 		if (map[i][j].cell_shown)
 	            SDL_RenderCopy(*renderer, element[0], NULL, &(rectangles[iteri][iterj]));
@@ -171,8 +270,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 	    }
 	    ++iteri;
 	}
-
-        //~~~//
+	SDL_RenderCopy(*renderer, character, NULL, &charrect);
 
 	SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
 	SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -195,28 +293,22 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 						rules = false; // close rules
 						changes = true;
 					}
-
-        //~~~//
-
 					else if (event.key.keysym.sym == SDLK_UP) {
-                                           check_up = mx_check_up(map, y, x);
+                                           check_up = mx_check_up(map, y, x, treasure);
                                            changes = true;
                                        }
                                        else if (event.key.keysym.sym == SDLK_DOWN) {
-                                           check_down = mx_check_down(map, y, x);
+                                           check_down = mx_check_down(map, y, x, treasure);
                                            changes = true;
                                        }
                                        else if (event.key.keysym.sym == SDLK_LEFT) {
-                                           check_left = mx_check_left(map, y, x);
+                                           check_left = mx_check_left(map, y, x, treasure);
                                            changes = true;
                                        }
                                        else if (event.key.keysym.sym == SDLK_RIGHT) {
-                                           check_right = mx_check_right(map, y, x);
+                                           check_right = mx_check_right(map, y, x, treasure);
                                            changes = true;
                                        }
-
-        //~~~//
-
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
@@ -269,9 +361,6 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		}
 		SDL_Delay(100);
 
-        //~~~//
-
-		
 	    if (check_up != -1) {
             switch(check_up) {
                 case 0: {
@@ -338,6 +427,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		    y -= 1;
                     treasure = map[y][x].treasure;
 		    map[y][x].cell_shown = true;
+                    map[y][x].treasure = -1;
                 }
             }
         }
@@ -407,6 +497,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		    y += 1;
                     treasure = map[y][x].treasure;
 		    map[y][x].cell_shown = true;
+                    map[y][x].treasure = -1;
                 }
             }
         }
@@ -476,6 +567,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
                     x -= 1;
                     treasure = map[y][x].treasure;
                     map[y][x].cell_shown = true;
+                    map[y][x].treasure = -1;
                 }
             }
         }
@@ -545,6 +637,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
                     x += 1;
                     treasure = map[y][x].treasure;
                     map[y][x].cell_shown = true;
+                    map[y][x].treasure = -1;
                 }
             }
         }
@@ -553,8 +646,6 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
         check_left = -1;
         check_right = -1;
 
-        //~~~//
-
 		if (changes == true) {
 			SDL_RenderClear(*renderer);
 			if (rules)
@@ -562,14 +653,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 			else {
 				SDL_RenderCopy(*renderer, game_background_tex, NULL, NULL);
 
-        //~~~//
-				
 				SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
-				iteri = 0;
 				stopi = y + 3 < 10 ? y + 3 : 10;
 				stopj = x + 3 < 10 ? x + 3 : 10;
+	                        iteri = y - 2 > 0 ? 0 : 2 - y;
+	                        iterj = x - 2 > 0 ? 0 : 2 - x;
                         	for (int i = y - 2 > -1 ? y - 2 : 0; i < stopi; ++i) {
-	                           iterj = 0;
+	                           iterj = x - 2 > 0 ? 0 : 2 - x;
 	                           for (int j = x - 2 > -1 ? x - 2 : 0; j < stopj; ++j) {
 		                       if (map[i][j].cell_shown)
 	                                   SDL_RenderCopy(*renderer, element[0], NULL, &(rectangles[iteri][iterj]));
@@ -589,8 +679,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 	                           }
 	                           ++iteri;
 	                       }
-
-        //~~~//
+	                       SDL_RenderCopy(*renderer, character, NULL, &charrect);
 
 				if (pause) {
 					SDL_RenderCopy(*renderer, dark_background_tex, NULL, NULL);
@@ -610,15 +699,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
     		SDL_RenderPresent(*renderer);
     	}
 	}
-
-        //~~~//
-
 	for (int i = 0; i < 11; ++i)
 	    SDL_DestroyTexture(element[i]);
 	SDL_DestroyTexture(fog);
-
-        //~~~//
-
+	SDL_DestroyTexture(character);
 	SDL_DestroyTexture(game_background_tex);
 	SDL_DestroyTexture(dark_background_tex);
 	SDL_DestroyTexture(rules_background_tex);
@@ -630,4 +714,3 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 	SDL_DestroyTexture(start_button_tex);
     SDL_DestroyTexture(exit_button_tex);
 }
-
