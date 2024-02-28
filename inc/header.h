@@ -41,10 +41,10 @@ typedef struct cell {
 void mx_map(cell karta[10][10]);
 void mx_gen(cell map[10][10]);
 void mx_randyx(int *y, int *x);
-int mx_check_up(cell map[10][10], int y, int x);
-int mx_check_down(cell map[10][10], int y, int x);
-int mx_check_left(cell map[10][10], int y, int x);
-int mx_check_right(cell map[10][10], int y, int x);
+int mx_check_up(cell map[10][10], int y, int x, int treasure);
+int mx_check_down(cell map[10][10], int y, int x, int treasure);
+int mx_check_left(cell map[10][10], int y, int x, int treasure);
+int mx_check_right(cell map[10][10], int y, int x, int treasure);
 
         //~~~//
 
