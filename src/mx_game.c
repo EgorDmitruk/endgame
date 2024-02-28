@@ -293,26 +293,26 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 						rules = false; // close rules
 						changes = true;
 					}
-					else if (event.key.keysym.sym == SDLK_UP) {
-                                            Mix_PlayChannel(-1, FootStepSound, 0);
-                                           check_up = mx_check_up(map, y, x, treasure);
-                                           changes = true;
-                                       }
-                                       else if (event.key.keysym.sym == SDLK_DOWN) {
-                                            Mix_PlayChannel(-1, FootStepSound, 0);
-                                           check_down = mx_check_down(map, y, x, treasure);
-                                           changes = true;
-                                       }
-                                       else if (event.key.keysym.sym == SDLK_LEFT) {
-                                            Mix_PlayChannel(-1, FootStepSound, 0);
-                                           check_left = mx_check_left(map, y, x, treasure);
-                                           changes = true;
-                                       }
-                                       else if (event.key.keysym.sym == SDLK_RIGHT) {
-                                            Mix_PlayChannel(-1, FootStepSound, 0);
-                                           check_right = mx_check_right(map, y, x, treasure);
-                                           changes = true;
-                                       }
+					else if (event.key.keysym.sym == SDLK_UP && !rules && !pause) {
+                        Mix_PlayChannel(-1, FootStepSound, 0);
+                        check_up = mx_check_up(map, y, x, treasure);
+                        changes = true;
+                    }
+                    else if (event.key.keysym.sym == SDLK_DOWN && !rules && !pause) {
+                        Mix_PlayChannel(-1, FootStepSound, 0);
+                        check_down = mx_check_down(map, y, x, treasure);
+                        changes = true;
+                    }
+                    else if (event.key.keysym.sym == SDLK_LEFT && !rules && !pause) {
+                        Mix_PlayChannel(-1, FootStepSound, 0);
+                        check_left = mx_check_left(map, y, x, treasure);
+                        changes = true;
+                    }
+                    else if (event.key.keysym.sym == SDLK_RIGHT && !rules && !pause) {
+                        Mix_PlayChannel(-1, FootStepSound, 0);
+                        check_right = mx_check_right(map, y, x, treasure);
+                        changes = true;
+                    }
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == SDL_BUTTON_LEFT) {
