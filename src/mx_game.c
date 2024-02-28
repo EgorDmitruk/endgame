@@ -20,7 +20,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
-
+    Mix_Chunk *FootStepSound = Mix_LoadWAV("./resources/music/FootStepSound.wav");
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
 
 	// create side buttons
@@ -294,18 +294,22 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 						changes = true;
 					}
 					else if (event.key.keysym.sym == SDLK_UP) {
+                                            Mix_PlayChannel(-1, FootStepSound, 0);
                                            check_up = mx_check_up(map, y, x, treasure);
                                            changes = true;
                                        }
                                        else if (event.key.keysym.sym == SDLK_DOWN) {
+                                            Mix_PlayChannel(-1, FootStepSound, 0);
                                            check_down = mx_check_down(map, y, x, treasure);
                                            changes = true;
                                        }
                                        else if (event.key.keysym.sym == SDLK_LEFT) {
+                                            Mix_PlayChannel(-1, FootStepSound, 0);
                                            check_left = mx_check_left(map, y, x, treasure);
                                            changes = true;
                                        }
                                        else if (event.key.keysym.sym == SDLK_RIGHT) {
+                                            Mix_PlayChannel(-1, FootStepSound, 0);
                                            check_right = mx_check_right(map, y, x, treasure);
                                            changes = true;
                                        }
