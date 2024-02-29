@@ -1,7 +1,7 @@
 #include "../inc/header.h"
 
-void mx_game(SDL_Window **window, SDL_Renderer **renderer,
-			 int *start, int *start_play) {
+void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
+			 int *start_play, int *start_end, uint32_t *start_time, uint32_t *pause_time) {
 	SDL_Texture *game_background_tex = mx_change_background("./resources/images/game_background.png",
 															 renderer);
 	if (game_background_tex == NULL) {
@@ -281,7 +281,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 	int changes = false;
 
 	// game loop
-	while (*start && start_play) {
+	uint32_t pause_start;
+	uint32_t pause_finish;
+	*start_time = SDL_GetTicks();
+	while (*start && *start_play) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event) != 0) {
 			switch (event.type) {
@@ -345,10 +348,15 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 							&& event.button.y < pause_button.y + pause_button.h) {
 								if (!rules) {
 									Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
-									if (pause == false)
+									if (pause == false) {
 										pause = true; // open pause text
-									else
+										pause_start = SDL_GetTicks();
+									}
+									else {
 										pause = false;
+										pause_finish = SDL_GetTicks();
+										*pause_time = *pause_time + pause_finish - pause_start;
+									}
 									changes = true;
 								}
 						}
@@ -377,8 +385,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
 		    break;
                 }
                 case 2: {
-                    if (treasure == 1)
-                        start_play = false;
+                    if (treasure == 1) {
+                        *start_play = false;
+                        *start_end = true;
+                    }
                     else if (treasure == 0)
                         treasure = -1;// ложный клад
                     //else
@@ -447,8 +457,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
                     break;
                 }
                 case 2: {
-                    if (treasure == 1)
-                        start_play = false;
+                    if (treasure == 1) {
+                        *start_play = false;
+                        *start_end = true;
+                    }
                     else if (treasure == 0)
                         treasure = -1;// ложный клад
                     //else
@@ -517,8 +529,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
                     break;
                 }
                 case 2: {
-                    if (treasure == 1)
-                        start_play = false;
+                    if (treasure == 1) {
+                        *start_play = false;
+                        *start_end = true;
+                    }
                     else if (treasure == 0)
                         treasure = -1;// ложный клад
                     //else
@@ -587,8 +601,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer,
                     break;
                 }
                 case 2: {
-                    if (treasure == 1)
-                        start_play = false;
+                    if (treasure == 1) {
+                        *start_play = false;
+                        *start_end = true;
+                    }
                     else if (treasure == 0)
                         treasure = -1;// ложный клад
                     //else

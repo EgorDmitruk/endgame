@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -53,8 +54,14 @@ void mx_destroy_window(SDL_Window **window, SDL_Renderer **renderer);
 SDL_Texture *mx_change_background(const char* imagePath, SDL_Renderer **renderer);
 SDL_Texture *mx_create_button(const char *image_path, SDL_Renderer **renderer,
 							  SDL_Rect *button, int down, int side, int cx, int cy);
-void mx_menu(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play);
-void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play);
+SDL_Texture *mx_create_text(const char *text, SDL_Renderer **renderer, SDL_Rect *font_rect,
+							SDL_Color color, int down, int side, int cx, int cy, int size);
+void mx_menu(SDL_Window **window, SDL_Renderer **renderer, int *start,
+			 int *start_play, int *start_menu);
+void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
+			 int *start_play, int *start_end, uint32_t *start_time, uint32_t *pause_time);
+void mx_end_menu(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play,
+				 int *start_menu, int *start_end, uint32_t *start_time, uint32_t *pause_time);
 void mx_play_menu_music(const char *musicPath, int MusicFlag);
 
 void mx_printerr(const char *s);

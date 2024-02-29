@@ -1,7 +1,7 @@
 #include "../inc/header.h"
 
 void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
-			 int *start, int *start_play) {
+			 int *start, int *start_play, int *start_menu) {
 	SDL_Texture *start_background_tex = mx_change_background("./resources/images/StartMenuImage.png",
 															 renderer);
 	if (start_background_tex == NULL) {
@@ -17,8 +17,17 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 
 	int MusicFlag = 1;
 	mx_play_menu_music("./resources/music/StartMenuMusic.mp3", MusicFlag);
-	
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
+
+	// message
+	SDL_Color color = {0, 0, 46, 255};
+	SDL_Rect message;
+    SDL_Texture *message_tex = mx_create_text("Fair winds to ye!", renderer,
+    										  &message, color, 415, 0, 2, 2, 150);
+    if (message_tex == NULL) {
+		mx_destroy_window(window, renderer);
+		exit(1);
+	}
 
 	// create start menu buttons
 	int pd = 610;
@@ -93,6 +102,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 
 	SDL_RenderClear(*renderer);
 	SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+	SDL_RenderCopy(*renderer, message_tex, NULL, &message);
 	SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
 	SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
 	SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
@@ -103,8 +113,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 	int mouse_on_button = false;
 
 	// start menu loop
-	int start_menu = true;
-	while (*start && start_menu) {
+	while (*start && *start_menu) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event) != 0) {
 			switch (event.type) {
@@ -125,7 +134,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 							&& event.button.y < play_button.y + play_button.h) {
 								if (!start_about_us) {
 									Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
-									start_menu = false; // finish menu loop
+									*start_menu = false; // finish menu loop
 									*start_play = true; // play
 									changes = true;
 									MusicFlag = 2;
@@ -175,6 +184,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 			&& y > play_button.y && y < play_button.y + play_button.h && !start_about_us) {
 			SDL_RenderClear(*renderer);
 			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, message_tex, NULL, &message);
 			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
 			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
 			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
@@ -187,6 +197,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 			&& y > music_button.y && y < music_button.y + music_button.h && !start_about_us) {
 			SDL_RenderClear(*renderer);
 			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, message_tex, NULL, &message);
 			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
 			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
 			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
@@ -199,6 +210,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 			&& y > about_us_button.y && y < about_us_button.y + about_us_button.h && !start_about_us) {
 			SDL_RenderClear(*renderer);
 			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, message_tex, NULL, &message);
 			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
 			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
 			SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
@@ -211,6 +223,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 			&& y > exit_button.y && y < exit_button.y + exit_button.h && !start_about_us) {
 			SDL_RenderClear(*renderer);
 			SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+			SDL_RenderCopy(*renderer, message_tex, NULL, &message);
 			SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
 			SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
 			SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
@@ -231,6 +244,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
 				SDL_RenderCopy(*renderer, about_us_background_tex, NULL, NULL);
 			else {
 				SDL_RenderCopy(*renderer, start_background_tex, NULL, NULL);
+				SDL_RenderCopy(*renderer, message_tex, NULL, &message);
 				SDL_RenderCopy(*renderer, play_button_tex, NULL, &play_button);
 				SDL_RenderCopy(*renderer, music_button_tex, NULL, &music_button);
 				SDL_RenderCopy(*renderer, about_us_button_tex, NULL, &about_us_button);
@@ -241,6 +255,7 @@ void mx_menu(SDL_Window **window, SDL_Renderer **renderer,
     	}
 	}
 	SDL_DestroyTexture(start_background_tex);
+	SDL_DestroyTexture(message_tex);
 	SDL_DestroyTexture(about_us_background_tex);
     SDL_DestroyTexture(play_button_tex);
     SDL_DestroyTexture(play_glow_button_tex);
