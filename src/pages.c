@@ -53,28 +53,16 @@ SDL_Texture *mx_createpage(int minx, int miny, int maxx, int maxy, SDL_Surface *
 
 void mx_draw_unlocked(cell map[10][10], int x, int y, SDL_Surface **tempsurf, SDL_Surface *miniel[16]) {
     if (map[y][x].wall_up_unlocked) {
-        if (y == 0)
-            mx_drawpage(&miniel[1], tempsurf, x, y);
-        else
-            mx_drawpage(&miniel[5], tempsurf, x, y);
+        mx_drawpage(&miniel[1], tempsurf, x, y);
     }
     if (map[y][x].wall_down_unlocked) {
-        if (y == 9)
-            mx_drawpage(&miniel[2], tempsurf, x, y);
-        else
-            mx_drawpage(&miniel[6], tempsurf, x, y);
+        mx_drawpage(&miniel[2], tempsurf, x, y);
     }
     if (map[y][x].wall_left_unlocked) {
-        if (x == 0)
-            mx_drawpage(&miniel[3], tempsurf, x, y);
-        else
-            mx_drawpage(&miniel[7], tempsurf, x, y);
+        mx_drawpage(&miniel[3], tempsurf, x, y);
     }
     if (map[y][x].wall_right_unlocked) {
-        if (x == 9)
-            mx_drawpage(&miniel[4], tempsurf, x, y);
-        else
-            mx_drawpage(&miniel[8], tempsurf, x, y);
+        mx_drawpage(&miniel[4], tempsurf, x, y);
     }
 }
 
