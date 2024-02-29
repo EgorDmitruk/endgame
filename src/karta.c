@@ -19,6 +19,10 @@ void mx_map(cell karta[10][10]) {
             karta[j][i].wall_down_shown = false;
             karta[j][i].wall_left_shown = false;
             karta[j][i].wall_right_shown = false;
+            karta[j][i].wall_up_unlocked = false;
+            karta[j][i].wall_down_unlocked = false;
+            karta[j][i].wall_left_unlocked = false;
+            karta[j][i].wall_right_unlocked = false;
             karta[j][i].river_shown = false;
             karta[j][i].portal_shown = false;
         }
