@@ -25,6 +25,7 @@ void mx_map(cell karta[10][10]) {
             karta[j][i].wall_right_unlocked = false;
             karta[j][i].river_shown = false;
             karta[j][i].portal_shown = false;
+            karta[j][i].treasure_shown = false;
         }
     }
     karta[1][2].river = &karta[3][2];
