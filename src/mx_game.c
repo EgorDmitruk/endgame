@@ -1290,6 +1290,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 				SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
 				SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
 			}
+
+			for (int i = 0; i < page_num; ++i)
+                        	SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
+			
     		changes = false;
     		SDL_RenderPresent(*renderer);
     	}
