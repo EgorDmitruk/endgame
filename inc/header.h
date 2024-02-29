@@ -53,9 +53,8 @@ int mx_check_left(cell map[10][10], int y, int x, int treasure);
 int mx_check_right(cell map[10][10], int y, int x, int treasure);
 void mx_render_field(int y, int x, cell map[10][10], SDL_Renderer **renderer, SDL_Texture *element[16], SDL_Rect rectangles[5][5]);
 
-void mx_newpage(SDL_Surface **tempsurf, char *image, int *maxx, int *maxy, int *minx, int *miny, int x, int y);
-void mx_drawpage(SDL_Surface **image, SDL_Surface **tempsurf, int x, int y);
-SDL_Texture *mx_createpage(int minx, int miny, int maxx, int maxy, SDL_Surface **tempsurf, SDL_Renderer **renderer);
+void mx_drawmap(SDL_Surface **image, SDL_Surface **tempsurf, int x, int y);
+void mx_upload_map(SDL_Surface **tempsurf, SDL_Renderer **renderer, SDL_Texture **prew);
 void mx_draw_unlocked(cell map[10][10], int x, int y, SDL_Surface **tempsurf, SDL_Surface *miniel[16]);
 
         //~~~//
@@ -79,4 +78,3 @@ void mx_printerr(const char *s);
 int mx_strlen(const char *s);
 
 #endif
-
