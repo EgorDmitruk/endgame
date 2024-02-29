@@ -108,8 +108,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     SDL_Texture *fog = SDL_CreateTextureFromSurface(*renderer, tempsurf);
     SDL_FreeSurface(tempsurf);
     SDL_Rect fogrect;
-    fogrect.x = 265;
-    fogrect.y = 180;
+    fogrect.x = 300;
+    fogrect.y = 260;
     fogrect.w = 670;
     fogrect.h = 670;
     SDL_Surface *elements[12]; // массив с картинками пустой клетки, стен, рек, порталов
@@ -224,8 +224,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     SDL_Rect rectangles[5][5];
     for (int i = 0; i < 5; ++i) {
         for(int j = 0; j < 5; ++j) {
-	    rectangles[i][j].x = 265 + 134 * j;
-            rectangles[i][j].y = 180 + 134 * i;
+	    rectangles[i][j].x = 300 + 134 * j;
+            rectangles[i][j].y = 260 + 134 * i;
             rectangles[i][j].w = 134;
             rectangles[i][j].h = 134;
 	}
@@ -241,18 +241,14 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     SDL_Texture *character = SDL_CreateTextureFromSurface(*renderer, tempsurf);
     SDL_FreeSurface(tempsurf);
     SDL_Rect charrect;
-    charrect.x = 533;
-    charrect.y = 448;
+    charrect.x = 568;
+    charrect.y = 528;
     charrect.w = 134;
     charrect.h = 134;
     x = 6;
     y = 3;
     map[y][x].cell_shown = true;
 
-    int maxx, maxy, minx, miny;
-    int page_num = 0;
-    bool moving = false;
-    int moved_page = -1;
     SDL_Surface *miniel[12];
     miniel[0] = IMG_Load("./resources/images/locations/0small.png");
     if (miniel[0] == NULL) {
@@ -351,27 +347,44 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	exit(1);
     }
 
-    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-    mx_drawpage(&miniel[0], &tempsurf, x, y);
-    SDL_Texture *pages[500];
-    SDL_Rect pagesrect[500];
+    tempsurf = IMG_Load("./resources/images/locations/prozrachnyy_s_granitsami.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating field surface: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
     
-    int xoffset = -1;
-    int yoffset = -1;
-    int mousex, mousey;
-
+    SDL_Texture *map_tex = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    if (map_tex == NULL) {
+        mx_printerr("error creating map texture: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    SDL_Rect maprect;
+    maprect.x = 1150;
+    maprect.y = 260;
+    maprect.w = 670;
+    maprect.h = 670;
+    
 	SDL_RenderClear(*renderer);
 	SDL_RenderCopy(*renderer, game_background_tex, NULL, NULL);
 
 	SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
 	mx_render_field(y, x, map, renderer, element, rectangles);
 	SDL_RenderCopy(*renderer, character, NULL, &charrect);
+	SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
 	SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
 	SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
 	SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
 	SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
 	SDL_RenderPresent(*renderer);
+	
+	mx_drawmap(&miniel[0], &tempsurf, x, y);
 
 	int changes = false;
 
@@ -462,36 +475,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 								if (!rules)
 									*start = false; // quit
 							}
-						else if (!moving) {
-                                                  for (int i = page_num; i >= 0; --i) {
-                                                      if (event.button.x > pagesrect[i].x
-                                                          && event.button.x < pagesrect[i].x + pagesrect[i].w
-                                                          && event.button.y > pagesrect[i].y
-                                                          && event.button.y < pagesrect[i].y + pagesrect[i].h) {
-                                                          moved_page = i;
-                                                          moving = true;
-                                                          changes = true;
-                                                          break;
-                                                      }
-                                                  }
-                                              }
 					}
 					break;
-				case SDL_MOUSEBUTTONUP:
-                                          if (event.button.button == SDL_BUTTON_LEFT) {
-                                              if (moving) {
-                                                  if (event.button.x > pagesrect[moved_page].x
-                                                          && event.button.x < pagesrect[moved_page].x + pagesrect[moved_page].w
-                                                          && event.button.y > pagesrect[moved_page].y
-                                                          && event.button.y < pagesrect[moved_page].y + pagesrect[moved_page].h) {
-                                                          moved_page = -1;
-                                                          xoffset = -1;
-                                                          yoffset = -1;
-                                                          moving = false;
-                                                  }
-                                              }
-                                       }
-				break;
 			}
 		}
 		SDL_Delay(100);
@@ -499,28 +484,16 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	    if (check_up != -1) {
             switch(check_up) {
                 case 0: {
-                    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y - 1 > maxy)
-                        maxy = y - 1;
-                    if (y - 1 < miny)
-                        miny = y - 1;
-                    if (!(map[y - 1][x].cell_shown)) {
-                        mx_drawpage(&miniel[0], &tempsurf, x, y - 1);
-                        mx_draw_unlocked(map, x, y - 1, &tempsurf, miniel);
-                        map[y - 1][x].cell_shown = true;
-                    }
-		    y -= 1;
+                    y -= 1;
+                    mx_drawmap(&miniel[0], &tempsurf, x, y);
+                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+                    map[y][x].cell_shown = true;
 		    break;
                 }
                 case 1: {
-                    if (!(map[y][x].wall_up_shown)) {
-                        map[y][x].wall_up_shown = true;
-                        map[y][x].wall_up_unlocked = true;
-			mx_draw_unlocked(map, x, y, &tempsurf, miniel);
-                    }
+                    map[y][x].wall_up_shown = true;
+                    map[y][x].wall_up_unlocked = true;
+		     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 		    break;
                 }
                 case 2: {
@@ -535,18 +508,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		    break;
                 }
                 case 3: {
-		    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y - 1 > maxy)
-                        maxy = y - 1;
-                    if (y - 1 < miny)
-                        miny = y - 1;
-                    map[y - 1][x].river_shown = true;
-		    y -= 1;
+                    y -= 1;
+                    map[y][x].river_shown = true;
 
-		    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
 		    SDL_RenderClear(*renderer);
@@ -555,24 +520,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                   mx_upload_map(&tempsurf, renderer, &map_tex);
 			
 		    int prevy = y;
 		    int prevx = x;
@@ -587,27 +546,19 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].river_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 		    break;
                 }
                 case 4: {
-		    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y - 1 > maxy)
-                        maxy = y - 1;
-                    if (y - 1 < miny)
-                        miny = y - 1;
-                    map[y - 1][x].portal_shown = true;
                     y -= 1;
+                    map[y][x].portal_shown = true;
 
-		    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 		    
 		    SDL_RenderClear(*renderer);
@@ -616,24 +567,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
 		    int prevx = x;
@@ -648,36 +593,26 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].portal_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 5: {
 		    y -= 1;
-                    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
 		    if (treasure != -1) {
-		        if (!(map[y][x].treasure_shown)) {
-		            map[y][x].treasure_shown = true;
-		            mx_drawpage(&miniel[0], &tempsurf, x, y);
-		            mx_drawpage(&miniel[11], &tempsurf, x, y);
-		        }
+		        map[y][x].treasure_shown = true;
+		        mx_drawmap(&miniel[0], &tempsurf, x, y);
+		        mx_drawmap(&miniel[11], &tempsurf, x, y);
 		    }
 		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawpage(&miniel[0], &tempsurf, x, y);
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
 		    }
 		    map[y][x].cell_shown = true;
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
@@ -687,28 +622,16 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
         if (check_down != -1) { // со следующими свичами наподобие как с предыдущим
             switch(check_down) {
                 case 0: {
-                    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y + 1 > maxy)
-                        maxy = y + 1;
-                    if (y + 1 < miny)
-                        miny = y + 1;
-                    if (!(map[y + 1][x].cell_shown)) {
-                        mx_drawpage(&miniel[0], &tempsurf, x, y + 1);
-                        mx_draw_unlocked(map, x, y + 1, &tempsurf, miniel);
-                        map[y + 1][x].cell_shown = true;
-                    }
                     y += 1;
+                    mx_drawmap(&miniel[0], &tempsurf, x, y);
+                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+                    map[y][x].cell_shown = true;
                     break;
                 }
                 case 1: {
-                    if (!(map[y][x].wall_down_shown)) {
-                        map[y][x].wall_down_shown = true;
-                        map[y][x].wall_down_unlocked = true;
-			mx_draw_unlocked(map, x, y, &tempsurf, miniel);
-                    }
+                    map[y][x].wall_down_shown = true;
+                    map[y][x].wall_down_unlocked = true;
+		     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 2: {
@@ -723,18 +646,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     break;
                 }
                 case 3: {
-		    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y + 1 > maxy)
-                        maxy = y + 1;
-                    if (y + 1 < miny)
-                        miny = y + 1;
-                    map[y + 1][x].river_shown = true;
                     y += 1;
+                    map[y][x].river_shown = true;
 
-		    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
                     SDL_RenderClear(*renderer);
@@ -743,24 +658,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
 		    int prevx = x;
@@ -775,27 +684,19 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].river_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 4: {
-		    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y + 1 > maxy)
-                        maxy = y + 1;
-                    if (y + 1 < miny)
-                        miny = y + 1;
-                    map[y + 1][x].portal_shown = true;
                     y += 1;
+                    map[y][x].portal_shown = true;
 
-		    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
                     SDL_RenderClear(*renderer);
@@ -804,24 +705,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
 		    int prevx = x;
@@ -836,36 +731,26 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].portal_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 5: {
-		    y += 1;
-                    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
+                    y += 1;
 		    if (treasure != -1) {
-		        if (!(map[y][x].treasure_shown)) {
-                            map[y][x].treasure_shown = true;
-                            mx_drawpage(&miniel[0], &tempsurf, x, y);
-		            mx_drawpage(&miniel[11], &tempsurf, x, y);
-                        }
+                        map[y][x].treasure_shown = true;
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
+		        mx_drawmap(&miniel[11], &tempsurf, x, y);
                     }
                     else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawpage(&miniel[0], &tempsurf, x, y);
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
                     }
                     map[y][x].cell_shown = true;
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
@@ -875,28 +760,16 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
         if (check_left != -1) {
             switch(check_left) {
                 case 0: {
-                    if (x - 1 > maxx)
-                        maxx = x - 1;
-                    if (x - 1 < minx)
-                        minx = x - 1;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
-                    if (!(map[y][x - 1].cell_shown)) {
-                        mx_drawpage(&miniel[0], &tempsurf, x - 1, y);
-                        mx_draw_unlocked(map, x - 1, y, &tempsurf, miniel);
-                        map[y][x - 1].cell_shown = true;
-                    }
                     x -= 1;
+                    mx_drawmap(&miniel[0], &tempsurf, x, y);
+                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+                    map[y][x].cell_shown = true;
                     break;
                 }
                 case 1: {
-                    if (!(map[y][x].wall_left_shown)) {
-                        map[y][x].wall_left_shown = true;
-                        map[y][x].wall_left_unlocked = true;
-			mx_draw_unlocked(map, x, y, &tempsurf, miniel);
-                    }
+                    map[y][x].wall_left_shown = true;
+                    map[y][x].wall_left_unlocked = true;
+		     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 2: {
@@ -911,18 +784,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     break;
                 }
                 case 3: {
-		    if (x - 1 > maxx)
-                        maxx = x - 1;
-                    if (x - 1 < minx)
-                        minx = x - 1;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
-                    map[y][x - 1].river_shown = true;
                     x -= 1;
+                    map[y][x].river_shown = true;
 
-		    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
                     SDL_RenderClear(*renderer);
@@ -931,24 +796,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
                     int prevx = x;
@@ -963,27 +822,19 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].river_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 4: {
-		    if (x - 1 > maxx)
-                        maxx = x - 1;
-                    if (x - 1 < minx)
-                        minx = x - 1;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
-                    map[y][x - 1].portal_shown = true;
                     x -= 1;
+                    map[y][x].portal_shown = true;
 
-		    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
                     SDL_RenderClear(*renderer);
@@ -992,24 +843,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
                     int prevx = x;
@@ -1024,36 +869,26 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].portal_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 5: {
                     x -= 1;
-                    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
 		    if (treasure != -1) {
-		        if (!(map[y][x].treasure_shown)) {
-                            map[y][x].treasure_shown = true;
-                            mx_drawpage(&miniel[0], &tempsurf, x, y);
-		            mx_drawpage(&miniel[11], &tempsurf, x, y);
-                        }
+                        map[y][x].treasure_shown = true;
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
+		        mx_drawmap(&miniel[11], &tempsurf, x, y);
                     }
                     else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawpage(&miniel[0], &tempsurf, x, y);
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
                     }
                     map[y][x].cell_shown = true;
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
@@ -1063,28 +898,16 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
         if (check_right != -1) {
             switch(check_right) {
                 case 0: {
-                    if (x + 1 > maxx)
-                        maxx = x + 1;
-                    if (x + 1 < minx)
-                        minx = x + 1;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
-                    if (!(map[y][x + 1].cell_shown)) {
-                        mx_drawpage(&miniel[0], &tempsurf, x + 1, y);
-                        mx_draw_unlocked(map, x + 1, y, &tempsurf, miniel);
-                        map[y][x + 1].cell_shown = true;
-                    }
                     x += 1;
+                    mx_drawmap(&miniel[0], &tempsurf, x, y);
+                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+                    map[y][x].cell_shown = true;
                     break;
                 }
                 case 1: {
-                    if (!(map[y][x].wall_right_shown)) {
-                        map[y][x].wall_right_shown = true;
-                        map[y][x].wall_right_unlocked = true;
-			mx_draw_unlocked(map, x, y, &tempsurf, miniel);
-                    }
+                    map[y][x].wall_right_shown = true;
+                    map[y][x].wall_right_unlocked = true;
+		     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 2: {
@@ -1099,18 +922,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     break;
                 }
                 case 3: {
-		    if (x + 1 > maxx)
-                        maxx = x + 1;
-                    if (x + 1 < minx)
-                        minx = x + 1;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
-                    map[y][x + 1].river_shown = true;
                     x += 1;
+                    map[y][x].river_shown = true;
 
-		    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
                     SDL_RenderClear(*renderer);
@@ -1119,24 +934,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
                     int prevx = x;
@@ -1151,27 +960,19 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                             map[i][j].wall_right_shown = false;
                             map[i][j].river_shown = false;
                             map[i][j].portal_shown = false;
+                            map[i][j].treasure_shown = false;
                         }
                     }
 		    map[y][x].river_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[5 + map[y][x].river_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 4: {
-		    if (x + 1 > maxx)
-                        maxx = x + 1;
-                    if (x + 1 < minx)
-                        minx = x + 1;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
-                    map[y][x + 1].portal_shown = true;
                     x += 1;
+                    map[y][x].portal_shown = true;
 
-		    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+		    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
 
                     SDL_RenderClear(*renderer);
@@ -1180,24 +981,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
                     SDL_RenderCopy(*renderer, character, NULL, &charrect);
+                    SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
                     SDL_RenderCopy(*renderer, pause_button_tex, NULL, &pause_button);
                     SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
                     
-                    for (int i = 0; i < page_num; ++i)
-                        SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-                    
                     SDL_RenderPresent(*renderer);
 
                     SDL_Delay(1000);
                     
-                    pages[page_num] = mx_createpage(minx, miny, maxx, maxy, &tempsurf, renderer);
-		    pagesrect[page_num].x = 1000;
-		    pagesrect[page_num].y = 225;
-		    SDL_QueryTexture(pages[page_num], NULL, NULL, &pagesrect[page_num].w, &pagesrect[page_num].h);
-		    page_num += 1;
+                    mx_upload_map(&tempsurf, renderer, &map_tex);
 			
                     int prevy = y;
                     int prevx = x;
@@ -1212,36 +1007,26 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			    map[i][j].wall_right_shown = false;
 			    map[i][j].river_shown = false;
 			    map[i][j].portal_shown = false;
+			    map[i][j].treasure_shown = false;
 			}
 		    }
 		    map[y][x].portal_shown = true;
-		    mx_newpage(&tempsurf, "./resources/images/locations/prozrachnyy.png", &maxx, &maxy, &minx, &miny, x, y);
-                    mx_drawpage(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
+                    mx_drawmap(&miniel[8 + map[y][x].portal_num], &tempsurf, x, y);
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                     break;
                 }
                 case 5: {
                     x += 1;
-                    if (x > maxx)
-                        maxx = x;
-                    if (x < minx)
-                        minx = x;
-                    if (y > maxy)
-                        maxy = y;
-                    if (y < miny)
-                        miny = y;
                     if (treasure != -1) {
-                        if (!(map[y][x].treasure_shown)) {
-                            map[y][x].treasure_shown = true;
-                            mx_drawpage(&miniel[0], &tempsurf, x, y);
-		            mx_drawpage(&miniel[11], &tempsurf, x, y);
-                        }
+                        map[y][x].treasure_shown = true;
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
+		        mx_drawmap(&miniel[11], &tempsurf, x, y);
                     }
                     else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawpage(&miniel[0], &tempsurf, x, y);
+                        mx_drawmap(&miniel[0], &tempsurf, x, y);
                     }
                     map[y][x].cell_shown = true;
                     mx_draw_unlocked(map, x, y, &tempsurf, miniel);
@@ -1253,18 +1038,6 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
         check_left = -1;
         check_right = -1;
 
-	// двигаем листочек
-        SDL_GetMouseState(&mousex, &mousey);
-        if (moving) {
-            if (xoffset == -1 && yoffset == -1) {
-                xoffset = mousex - pagesrect[moved_page].x;
-                yoffset = mousey - pagesrect[moved_page].y;
-            }
-            pagesrect[moved_page].x = mousex - xoffset;
-            pagesrect[moved_page].y = mousey - yoffset;
-            changes = true;
-        }
-
 		if (changes == true) {
 			SDL_RenderClear(*renderer);
 			if (rules)
@@ -1275,6 +1048,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 				SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
 				mx_render_field(y, x, map, renderer, element, rectangles);
 	                        SDL_RenderCopy(*renderer, character, NULL, &charrect);
+	                        SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
 				if (pause) {
 					SDL_RenderCopy(*renderer, dark_background_tex, NULL, NULL);
@@ -1290,16 +1064,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 				SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
 				SDL_RenderCopy(*renderer, exit_button_tex, NULL, &exit_button);
 			}
-
-			for (int i = 0; i < page_num; ++i)
-                        	SDL_RenderCopy(*renderer, pages[i], NULL, &(pagesrect[i]));
-			
+                        
     		changes = false;
     		SDL_RenderPresent(*renderer);
     	}
 	}
-	for (int i = 0; i < page_num; ++i)
-	    SDL_DestroyTexture(pages[i]);
+	SDL_DestroyTexture(map_tex);
+	SDL_FreeSurface(tempsurf);
 	for (int i = 0; i < 12; ++i) {
 	    SDL_DestroyTexture(element[i]);
 	    SDL_FreeSurface(miniel[i]);
