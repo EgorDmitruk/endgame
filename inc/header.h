@@ -24,12 +24,16 @@ typedef struct cell {
     bool cell_shown;
     bool wall_up;
     bool wall_up_shown;
+    bool wall_up_unlocked;
     bool wall_down;
     bool wall_down_shown;
+    bool wall_down_unlocked;
     bool wall_right;
     bool wall_right_shown;
+    bool wall_right_unlocked;
     bool wall_left;
     bool wall_left_shown;
+    bool wall_left_unlocked;
     struct cell *river;
     int river_num;
     bool river_shown;
@@ -37,6 +41,7 @@ typedef struct cell {
     int portal_num;
     bool portal_shown;
     int treasure; // -1 - нет клада, 0 - ложный, 1 - истинный
+    bool treasure_shown;
 }              cell;
 
 void mx_map(cell karta[10][10]);
@@ -46,6 +51,12 @@ int mx_check_up(cell map[10][10], int y, int x, int treasure);
 int mx_check_down(cell map[10][10], int y, int x, int treasure);
 int mx_check_left(cell map[10][10], int y, int x, int treasure);
 int mx_check_right(cell map[10][10], int y, int x, int treasure);
+void mx_render_field(int y, int x, cell map[10][10], SDL_Renderer **renderer, SDL_Texture *element[16], SDL_Rect rectangles[5][5]);
+
+void mx_newpage(SDL_Surface **tempsurf, char *image, int *maxx, int *maxy, int *minx, int *miny, int x, int y);
+void mx_drawpage(SDL_Surface **image, SDL_Surface **tempsurf, int x, int y);
+SDL_Texture *mx_createpage(int minx, int miny, int maxx, int maxy, SDL_Surface **tempsurf, SDL_Renderer **renderer);
+void mx_draw_unlocked(cell map[10][10], int x, int y, SDL_Surface **tempsurf, SDL_Surface *miniel[16]);
 
         //~~~//
 
