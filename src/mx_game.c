@@ -112,7 +112,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     fogrect.y = 180;
     fogrect.w = 670;
     fogrect.h = 670;
-    SDL_Surface *elements[11]; // массив с картинками пустой клетки, стен, рек, порталов
+    SDL_Surface *elements[12]; // массив с картинками пустой клетки, стен, рек, порталов
     elements[0] = IMG_Load("./resources/images/locations/0.png");// загрузить в каждый элемент картинку с помощью IMG_Load(определённая картинка);
     if (elements[0] == NULL) {
         mx_printerr("error creating field surface: ");
