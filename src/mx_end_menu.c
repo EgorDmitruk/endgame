@@ -2,7 +2,7 @@
 
 void mx_end_menu(SDL_Window **window, SDL_Renderer **renderer, int *start, int *start_play,
 				 int *start_menu, int *start_end, uint32_t *start_time, uint32_t *pause_time) {
-	SDL_Texture *end_background_tex = mx_change_background("./resources/images/Image2.png",
+	SDL_Texture *end_background_tex = mx_change_background("./resources/images/end_background.png",
 														   renderer);
 	if (end_background_tex == NULL) {
 		mx_destroy_window(window, renderer);

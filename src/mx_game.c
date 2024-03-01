@@ -14,7 +14,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		mx_destroy_window(window, renderer);
 		exit(1);
 	}
-	SDL_Texture *rules_background_tex = mx_change_background("./resources/images/Image2.png",
+	SDL_Texture *rules_background_tex = mx_change_background("./resources/images/rules_background.png",
 															 renderer);
 	if (rules_background_tex == NULL) {
 		mx_destroy_window(window, renderer);
@@ -228,18 +228,53 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
             rectangles[i][j].y = 260 + 134 * i;
             rectangles[i][j].w = 134;
             rectangles[i][j].h = 134;
-	}
+		}
     }
-    tempsurf = IMG_Load("./resources/images/locations/character.png");
+
+    tempsurf = IMG_Load("./resources/images/locations/character_right1.png");
     if (tempsurf == NULL) {
-        mx_printerr("error creating character surface: ");
-	mx_printerr(SDL_GetError());
+        mx_printerr("error creating character_right1 surface: ");
+		mx_printerr(SDL_GetError());
         mx_printerr("\n");
-	mx_destroy_window(window, renderer);
-	exit(1);
+		mx_destroy_window(window, renderer);
+		exit(1);
     }
-    SDL_Texture *character = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    SDL_Texture *character_right1 = SDL_CreateTextureFromSurface(*renderer, tempsurf);
     SDL_FreeSurface(tempsurf);
+
+	tempsurf = IMG_Load("./resources/images/locations/character_right2.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating character_right2 surface: ");
+		mx_printerr(SDL_GetError());
+        mx_printerr("\n");
+		mx_destroy_window(window, renderer);
+		exit(1);
+    }
+    SDL_Texture *character_right2 = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    SDL_FreeSurface(tempsurf);
+
+	tempsurf = IMG_Load("./resources/images/locations/character_left1.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating character_left1 surface: ");
+		mx_printerr(SDL_GetError());
+        mx_printerr("\n");
+		mx_destroy_window(window, renderer);
+		exit(1);
+    }
+    SDL_Texture *character_left1 = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    SDL_FreeSurface(tempsurf);
+
+	tempsurf = IMG_Load("./resources/images/locations/character_left2.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating character_left2 surface: ");
+		mx_printerr(SDL_GetError());
+        mx_printerr("\n");
+		mx_destroy_window(window, renderer);
+		exit(1);
+    }
+    SDL_Texture *character_left2 = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    SDL_FreeSurface(tempsurf);
+
     SDL_Rect charrect;
     charrect.x = 568;
     charrect.y = 528;
@@ -375,7 +410,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
 	SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
 	mx_render_field(y, x, map, renderer, element, rectangles);
-	SDL_RenderCopy(*renderer, character, NULL, &charrect);
+	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
 	SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
 	SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -387,6 +422,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	mx_drawmap(&miniel[0], &tempsurf, x, y);
 
 	int changes = false;
+	int going_right = true; // true - going right, false - going left
+	int pose1 = false; // true - pose1, false - pose2
 
 	// game loop
 	uint32_t pause_start;
@@ -401,8 +438,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 					break;
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) {
-						rules = false; // close rules
-						changes = true;
+						if (rules) {
+							rules = false; // close rules
+							changes = true;
+						}
 					}
 					else if (event.key.keysym.sym == SDLK_UP && !rules && !pause) {
                         Mix_PlayChannel(-1, FootStepSound, 0);
@@ -418,11 +457,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                         Mix_PlayChannel(-1, FootStepSound, 0);
                         check_left = mx_check_left(map, y, x, treasure);
                         changes = true;
+                        going_right = false;
                     }
                     else if (event.key.keysym.sym == SDLK_RIGHT && !rules && !pause) {
                         Mix_PlayChannel(-1, FootStepSound, 0);
                         check_right = mx_check_right(map, y, x, treasure);
                         changes = true;
+                        going_right = true;
                     }
 					break;
 				case SDL_MOUSEBUTTONDOWN:
@@ -437,6 +478,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 										Mix_VolumeMusic(0); // no sound
 									else
 										Mix_VolumeMusic(MIX_MAX_VOLUME); // max sound
+									if (pose1)
+										pose1 = false;
+									else if (!pose1)
+										pose1 = true;
 									changes = true;
 								}
 							}
@@ -447,6 +492,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 								if (!rules) {
 									Mix_PlayChannel(-1, ChoiceButtonSoundEffect, 0);
 									rules = true; // open rules
+									if (pose1)
+										pose1 = false;
+									else if (!pose1)
+										pose1 = true;
 									changes = true;
 								}
 						}
@@ -519,7 +568,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -566,7 +636,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -657,7 +748,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -704,7 +816,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -795,7 +928,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -842,7 +996,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -933,7 +1108,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -980,7 +1176,28 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
                     SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
                     mx_render_field(y, x, map, renderer, element, rectangles);
-                    SDL_RenderCopy(*renderer, character, NULL, &charrect);
+
+		            if (going_right) {
+	                   	if (pose1 || pause) {
+	                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+	                    	pose1 = false;
+	                    }
+	                    else if (!pose1) {
+	                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+    	                	pose1 = true;
+    	                }
+    	            }
+    	            else {
+    	                if (pose1 || pause) {
+    	                	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+    	                	pose1 = false;
+    	                }
+    	                else if (!pose1) {
+    	                	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+    	                	pose1 = true;
+    	               	}
+    	            }
+
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
@@ -1047,8 +1264,29 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 
 				SDL_RenderCopy(*renderer, fog, NULL, &fogrect);
 				mx_render_field(y, x, map, renderer, element, rectangles);
-	                        SDL_RenderCopy(*renderer, character, NULL, &charrect);
-	                        SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+
+	            if (going_right) {
+                   	if (pose1 || pause) {
+                    	SDL_RenderCopy(*renderer, character_right1, NULL, &charrect);
+                    	pose1 = false;
+                    }
+                    else if (!pose1) {
+                    	SDL_RenderCopy(*renderer, character_right2, NULL, &charrect);
+                    	pose1 = true;
+                    }
+                }
+                else {
+                    if (pose1 || pause) {
+                    	SDL_RenderCopy(*renderer, character_left1, NULL, &charrect);
+                    	pose1 = false;
+                    }
+                    else if (!pose1) {
+                    	SDL_RenderCopy(*renderer, character_left2, NULL, &charrect);
+                    	pose1 = true;
+                   	}
+                }
+
+	            SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
 
 				if (pause) {
 					SDL_RenderCopy(*renderer, dark_background_tex, NULL, NULL);
@@ -1076,7 +1314,10 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	    SDL_FreeSurface(miniel[i]);
 	}
 	SDL_DestroyTexture(fog);
-	SDL_DestroyTexture(character);
+	SDL_DestroyTexture(character_right1);
+	SDL_DestroyTexture(character_right2);
+	SDL_DestroyTexture(character_left1);
+	SDL_DestroyTexture(character_left2);
 	SDL_DestroyTexture(game_background_tex);
 	SDL_DestroyTexture(dark_background_tex);
 	SDL_DestroyTexture(rules_background_tex);
