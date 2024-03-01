@@ -22,7 +22,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	}
     Mix_Chunk *FootStepSound = Mix_LoadWAV("./resources/music/FootStepSound.wav");
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
-
+    //Mix_Chunk *FakeTresureSound = Mix_LoadWAV("./resources/music/fake_treasure_sound.wav");
+    //Mix_Chunk *TrueTreasureSound = Mix_LoadWAV("./resources/music/true_treasure_sound.wav");
 	// create side buttons
 	int md = 750;
 	int rd = 550;
