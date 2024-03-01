@@ -383,6 +383,31 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	exit(1);
     }
 
+    tempsurf = IMG_Load("./resources/images/accept.png");
+    if (tempsurf == NULL) {
+        mx_printerr("error creating treasure mark surfacce: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    
+    SDL_Texture *treasure_mark = SDL_CreateTextureFromSurface(*renderer, tempsurf);
+    if (treasure_mark == NULL) {
+        mx_printerr("error creating treasure mark texture: ");
+	mx_printerr(SDL_GetError());
+	mx_printerr("\n");
+	mx_destroy_window(window, renderer);
+	exit(1);
+    }
+    SDL_Rect markrect;
+    markrect.x = 1775;
+    markrect.y = 11;
+    markrect.w = 128;
+    markrect.h = 128;
+    
+    SDL_FreeSurface(tempsurf);
+
     tempsurf = IMG_Load("./resources/images/locations/prozrachnyy_s_granitsami.png");
     if (tempsurf == NULL) {
         mx_printerr("error creating field surface: ");
@@ -592,6 +617,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -660,6 +687,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -771,6 +800,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -839,6 +870,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -950,6 +983,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -1018,6 +1053,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -1129,6 +1166,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -1197,6 +1236,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	            }
 
                     SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
                     SDL_RenderCopy(*renderer, music_on_button_tex, NULL, &music_on_button);
                     SDL_RenderCopy(*renderer, rules_button_tex, NULL, &rules_button);
@@ -1284,6 +1325,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                 }
 
 	            SDL_RenderCopy(*renderer, map_tex, NULL, &maprect);
+		    if (treasure != -1)
+                        SDL_RenderCopy(*renderer, treasure_mark, NULL, &markrect);
 
 				if (pause) {
 					SDL_RenderCopy(*renderer, dark_background_tex, NULL, NULL);
@@ -1305,6 +1348,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     	}
 	}
 	SDL_DestroyTexture(map_tex);
+	SDL_DestroyTexture(treasure_mark);
 	SDL_FreeSurface(tempsurf);
 	for (int i = 0; i < 12; ++i) {
 	    SDL_DestroyTexture(element[i]);
