@@ -47,10 +47,10 @@ typedef struct cell {
 void mx_map(cell karta[10][10]);
 void mx_gen(cell map[10][10]);
 void mx_randyx(int *y, int *x);
-int mx_check_up(cell map[10][10], int y, int x, int treasure);
-int mx_check_down(cell map[10][10], int y, int x, int treasure);
-int mx_check_left(cell map[10][10], int y, int x, int treasure);
-int mx_check_right(cell map[10][10], int y, int x, int treasure);
+int mx_check_up(cell map[10][10], int y, int x);
+int mx_check_down(cell map[10][10], int y, int x);
+int mx_check_left(cell map[10][10], int y, int x);
+int mx_check_right(cell map[10][10], int y, int x);
 void mx_render_field(int y, int x, cell map[10][10], SDL_Renderer **renderer, SDL_Texture *element[16], SDL_Rect rectangles[5][5]);
 
 void mx_drawmap(SDL_Surface **image, SDL_Surface **tempsurf, int x, int y);
