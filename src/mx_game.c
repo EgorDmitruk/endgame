@@ -445,23 +445,23 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 					}
 					else if (event.key.keysym.sym == SDLK_UP && !rules && !pause) {
                         Mix_PlayChannel(-1, FootStepSound, 0);
-                        check_up = mx_check_up(map, y, x, treasure);
+                        check_up = mx_check_up(map, y, x);
                         changes = true;
                     }
                     else if (event.key.keysym.sym == SDLK_DOWN && !rules && !pause) {
                         Mix_PlayChannel(-1, FootStepSound, 0);
-                        check_down = mx_check_down(map, y, x, treasure);
+                        check_down = mx_check_down(map, y, x);
                         changes = true;
                     }
                     else if (event.key.keysym.sym == SDLK_LEFT && !rules && !pause) {
                         Mix_PlayChannel(-1, FootStepSound, 0);
-                        check_left = mx_check_left(map, y, x, treasure);
+                        check_left = mx_check_left(map, y, x);
                         changes = true;
                         going_right = false;
                     }
                     else if (event.key.keysym.sym == SDLK_RIGHT && !rules && !pause) {
                         Mix_PlayChannel(-1, FootStepSound, 0);
-                        check_right = mx_check_right(map, y, x, treasure);
+                        check_right = mx_check_right(map, y, x);
                         changes = true;
                         going_right = true;
                     }
@@ -605,8 +605,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
 		    int prevy = y;
 		    int prevx = x;
-		    y = map[prevy][prevx].river->y;
-		    x = map[prevy][prevx].river->x;
+		    y = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->y : prevy;
+		    x = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -673,8 +673,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
 		    int prevx = x;
-                    y = map[prevy][prevx].portal->y;
-                    x = map[prevy][prevx].portal->x;
+                    y = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->y : prevy;
+		    x = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -694,18 +694,17 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                 }
                 case 5: {
 		    y -= 1;
+		    mx_drawmap(&miniel[0], &tempsurf, x, y);
+		    map[y][x].cell_shown = true;
 		    if (treasure != -1) {
 		        map[y][x].treasure_shown = true;
-		        mx_drawmap(&miniel[0], &tempsurf, x, y);
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
 		    }
 		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
 		    }
-		    map[y][x].cell_shown = true;
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
             }
@@ -785,8 +784,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
 		    int prevx = x;
-                    y = map[prevy][prevx].river->y;
-                    x = map[prevy][prevx].river->x;
+                    y = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->y : prevy;
+		    x = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -853,8 +852,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
 		    int prevx = x;
-                    y = map[prevy][prevx].portal->y;
-                    x = map[prevy][prevx].portal->x;
+                    y = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->y : prevy;
+		    x = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -874,19 +873,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                 }
                 case 5: {
                     y += 1;
+		    mx_drawmap(&miniel[0], &tempsurf, x, y);
+		    map[y][x].cell_shown = true;
 		    if (treasure != -1) {
-                        map[y][x].treasure_shown = true;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
+		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
-                    }
-                    else {
+		    }
+		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
-                    }
-                    map[y][x].cell_shown = true;
-                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+		    }
+		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
             }
         }
@@ -965,8 +963,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
                     int prevx = x;
-                    y = map[prevy][prevx].river->y;
-                    x = map[prevy][prevx].river->x;
+                    y = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->y : prevy;
+		    x = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -1033,8 +1031,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
                     int prevx = x;
-                    y = map[prevy][prevx].portal->y;
-                    x = map[prevy][prevx].portal->x;
+                    y = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->y : prevy;
+		    x = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -1054,19 +1052,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                 }
                 case 5: {
                     x -= 1;
+		    mx_drawmap(&miniel[0], &tempsurf, x, y);
+		    map[y][x].cell_shown = true;
 		    if (treasure != -1) {
-                        map[y][x].treasure_shown = true;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
+		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
-                    }
-                    else {
+		    }
+		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
-                    }
-                    map[y][x].cell_shown = true;
-                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+		    }
+		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
             }
         }
@@ -1145,8 +1142,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
                     int prevx = x;
-                    y = map[prevy][prevx].river->y;
-                    x = map[prevy][prevx].river->x;
+                    y = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->y : prevy;
+		    x = map[prevy][prevx].river != NULL ? map[prevy][prevx].river->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
                         for (int j = 0; j < 10; ++j) {
                             map[i][j].cell_shown = false;
@@ -1213,8 +1210,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 			
                     int prevy = y;
                     int prevx = x;
-                    y = map[prevy][prevx].portal->y;
-                    x = map[prevy][prevx].portal->x;
+                    y = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->y : prevy;
+		    x = map[prevy][prevx].portal != NULL ? map[prevy][prevx].portal->x : prevx;
 		    for (int i = 0; i < 10; ++i) {
 		        for (int j = 0; j < 10; ++j) {
 			    map[i][j].cell_shown = false;
@@ -1234,19 +1231,18 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
                 }
                 case 5: {
                     x += 1;
-                    if (treasure != -1) {
-                        map[y][x].treasure_shown = true;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
+                    mx_drawmap(&miniel[0], &tempsurf, x, y);
+		    map[y][x].cell_shown = true;
+		    if (treasure != -1) {
+		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
-                    }
-                    else {
+		    }
+		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
-                        mx_drawmap(&miniel[0], &tempsurf, x, y);
-                    }
-                    map[y][x].cell_shown = true;
-                    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
+		    }
+		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
             }
         }
