@@ -92,7 +92,7 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		exit(1);
 	}
     cell map[10][10];
-    mx_map(map);
+    mx_gen(map);
     int x, y;
     int check_up = -1;
     int check_down = -1;
@@ -282,8 +282,12 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
     charrect.y = 528;
     charrect.w = 134;
     charrect.h = 134;
-    x = 6;
-    y = 3;
+
+    mx_randyx(&y, &x); //закидываем игрока в самом начале игры
+    while (map[y][x].river != NULL || map[y][x].portal != NULL
+           || map[y][x].treasure != -1)
+        mx_randyx(&y, &x);
+    map[y][x].cell_shown = true;
     map[y][x].cell_shown = true;
 
     SDL_Surface *miniel[12];
