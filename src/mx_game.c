@@ -22,8 +22,8 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 	}
     Mix_Chunk *FootStepSound = Mix_LoadWAV("./resources/music/FootStepSound.wav");
 	Mix_Chunk *ChoiceButtonSoundEffect = Mix_LoadWAV("./resources/music/ChoiceButtonSoundEffect.wav");
-    //Mix_Chunk *FakeTresureSound = Mix_LoadWAV("./resources/music/fake_treasure_sound.wav");
-    //Mix_Chunk *TrueTreasureSound = Mix_LoadWAV("./resources/music/true_treasure_sound.wav");
+    Mix_Chunk *FakeTresureSound = Mix_LoadWAV("./resources/music/fake_treasure_sound.wav");
+    Mix_Chunk *TrueTreasureSound = Mix_LoadWAV("./resources/music/true_treasure_sound.wav");
 	// create side buttons
 	int md = 750;
 	int rd = 550;
@@ -700,11 +700,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		    if (treasure != -1) {
 		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
+                Mix_PlayChannel(-1, TrueTreasureSound, 0);
 		    }
 		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
+                        Mix_PlayChannel(-1, FakeTresureSound, 0);
 		    }
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
@@ -879,11 +881,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		    if (treasure != -1) {
 		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
+                Mix_PlayChannel(-1, TrueTreasureSound, 0);
 		    }
 		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
+                        Mix_PlayChannel(-1, FakeTresureSound, 0);
 		    }
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
@@ -1058,11 +1062,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		    if (treasure != -1) {
 		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
+                Mix_PlayChannel(-1, TrueTreasureSound, 0);
 		    }
 		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
+                        Mix_PlayChannel(-1, FakeTresureSound, 0);
 		    }
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
@@ -1237,11 +1243,13 @@ void mx_game(SDL_Window **window, SDL_Renderer **renderer, int *start,
 		    if (treasure != -1) {
 		        map[y][x].treasure_shown = true;
 		        mx_drawmap(&miniel[11], &tempsurf, x, y);
+                Mix_PlayChannel(-1, TrueTreasureSound, 0);
 		    }
 		    else {
                         treasure = map[y][x].treasure;
                         map[y][x].treasure = -1;
                         map[y][x].treasure_shown = false;
+                        Mix_PlayChannel(-1, FakeTresureSound, 0);
 		    }
 		    mx_draw_unlocked(map, x, y, &tempsurf, miniel);
                 }
